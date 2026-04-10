@@ -1,0 +1,10 @@
+.next
+node_modules
+.git
+.env
+.env.*
+!.env.example
+pnpm-debug.log*
+README.md
+*.md
+.DS_Store
