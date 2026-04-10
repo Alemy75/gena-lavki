@@ -9,6 +9,11 @@ const mockItems = [
   { name: "Контейнер для раздельного сбора", image: "https://picsum.photos/id/1060/400/300" },
   { name: "Вазон уличный", image: "https://picsum.photos/id/306/400/300" },
   { name: "Ограждение декоративное", image: "https://picsum.photos/id/48/400/300" },
+  { name: "Фонарь столбовой", image: "https://picsum.photos/id/169/400/300" },
+  { name: "Перила пешеходные", image: "https://picsum.photos/id/28/400/300" },
+  { name: "Крышка люка садовая", image: "https://picsum.photos/id/119/400/300" },
+  { name: "Столик уличный", image: "https://picsum.photos/id/180/400/300" },
+  { name: "Клумба бетонная", image: "https://picsum.photos/id/82/400/300" },
 ];
 
 async function main() {
