@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
@@ -17,6 +18,16 @@ const mockItems = [
 ];
 
 async function main() {
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+  const hash = await bcrypt.hash(adminPassword, 10);
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: { passwordHash: hash },
+    create: { email: adminEmail, passwordHash: hash },
+  });
+  console.log(`Admin: ${adminEmail} (пароль из ADMIN_PASSWORD или по умолчанию admin123)`);
+
   await prisma.catalogItem.deleteMany();
   await prisma.catalogItem.createMany({ data: mockItems });
 }
