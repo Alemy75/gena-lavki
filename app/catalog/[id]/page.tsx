@@ -17,6 +17,7 @@ export default async function CatalogItemPage({ params }: PageProps) {
 
   const item = await prisma.catalogItem.findUnique({
     where: { id },
+    include: { category: true },
   });
 
   if (!item) {
@@ -43,6 +44,16 @@ export default async function CatalogItemPage({ params }: PageProps) {
           />
         </div>
         <div className="p-6 sm:p-8">
+          {item.category ? (
+            <p className="mb-2">
+              <Link
+                href={`/?category=${item.category.id}`}
+                className="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+              >
+                {item.category.name}
+              </Link>
+            </p>
+          ) : null}
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
             {item.name}
           </h1>

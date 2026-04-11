@@ -13,10 +13,24 @@ const ALLOWED_TYPES = new Set([
   "image/gif",
 ]);
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url);
+    const categoryParam = url.searchParams.get("categoryId");
+    let categoryIdFilter: number | undefined;
+    if (categoryParam !== null && categoryParam !== "") {
+      const n = Number.parseInt(categoryParam, 10);
+      if (!Number.isFinite(n) || n < 1) {
+        return NextResponse.json({ error: "Некорректный categoryId" }, { status: 400 });
+      }
+      categoryIdFilter = n;
+    }
+
     const items = await prisma.catalogItem.findMany({
+      where:
+        categoryIdFilter !== undefined ? { categoryId: categoryIdFilter } : undefined,
       orderBy: { id: "asc" },
+      include: { category: true },
     });
     return NextResponse.json(items);
   } catch (error) {
@@ -43,7 +57,21 @@ export async function POST(request: Request) {
 
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const categoryIdRaw = formData.get("categoryId");
   const file = formData.get("image");
+
+  let categoryId: number | null = null;
+  if (categoryIdRaw !== null && String(categoryIdRaw).trim() !== "") {
+    const n = Number.parseInt(String(categoryIdRaw), 10);
+    if (!Number.isFinite(n) || n < 1) {
+      return NextResponse.json({ error: "Некорректная категория" }, { status: 400 });
+    }
+    const exists = await prisma.category.findUnique({ where: { id: n } });
+    if (!exists) {
+      return NextResponse.json({ error: "Категория не найдена" }, { status: 400 });
+    }
+    categoryId = n;
+  }
 
   if (!name) {
     return NextResponse.json({ error: "Укажите название" }, { status: 400 });
@@ -86,7 +114,8 @@ export async function POST(request: Request) {
 
   try {
     const item = await prisma.catalogItem.create({
-      data: { name, description, image: publicPath },
+      data: { name, description, image: publicPath, categoryId },
+      include: { category: true },
     });
     return NextResponse.json(item, { status: 201 });
   } catch (error) {
