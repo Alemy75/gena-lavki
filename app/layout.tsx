@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SiteFooter } from "@/components/site-footer";
 import Link from "next/link";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -33,8 +34,8 @@ export default function RootLayout({
         className={`${geistSans.className} min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100`}
       >
         <Providers>
-        <header className="border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+        <header className="border-b border-zinc-200 bg-white py-4 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <Link href="/" className="text-lg font-semibold tracking-tight">
               Каталог
             </Link>
@@ -49,11 +50,7 @@ export default function RootLayout({
           </div>
         </header>
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-zinc-200 bg-white px-6 py-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          <div className="mx-auto max-w-5xl text-center">
-            © {new Date().getFullYear()} Каталог
-          </div>
-        </footer>
+        <SiteFooter />
         </Providers>
       </body>
     </html>

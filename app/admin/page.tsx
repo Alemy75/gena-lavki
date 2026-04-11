@@ -19,6 +19,14 @@ type CatalogItem = {
   category: { id: number; name: string } | null;
 };
 
+type SocialLink = {
+  id: number;
+  label: string;
+  url: string;
+  icon: string;
+  sortOrder: number;
+};
+
 function CategoryRow({
   category,
   onChanged,
@@ -125,6 +133,169 @@ function CategoryRow({
   );
 }
 
+function SocialLinkRow({
+  link,
+  onChanged,
+  onError,
+}: {
+  link: SocialLink;
+  onChanged: () => void;
+  onError: (text: string) => void;
+}) {
+  const [label, setLabel] = useState(link.label);
+  const [url, setUrl] = useState(link.url);
+  const [sortOrder, setSortOrder] = useState(String(link.sortOrder));
+  const [iconFile, setIconFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setLabel(link.label);
+    setUrl(link.url);
+    setSortOrder(String(link.sortOrder));
+    setIconFile(null);
+  }, [link]);
+
+  async function save() {
+    setBusy(true);
+    try {
+      if (iconFile) {
+        const fd = new FormData();
+        fd.append("label", label.trim());
+        fd.append("url", url.trim());
+        fd.append("sortOrder", sortOrder);
+        fd.append("icon", iconFile);
+        const res = await fetch(`/api/social-links/${link.id}`, {
+          method: "PATCH",
+          body: fd,
+          credentials: "include",
+        });
+        const data = (await res.json()) as { error?: string };
+        if (!res.ok) {
+          throw new Error(data.error ?? res.statusText);
+        }
+      } else {
+        const res = await fetch(`/api/social-links/${link.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            label: label.trim(),
+            url: url.trim(),
+            sortOrder: Number.parseInt(sortOrder, 10) || 0,
+          }),
+        });
+        const data = (await res.json()) as { error?: string };
+        if (!res.ok) {
+          throw new Error(data.error ?? res.statusText);
+        }
+      }
+      setIconFile(null);
+      onChanged();
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "Ошибка");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove() {
+    if (!confirm(`Удалить «${link.label}»?`)) {
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/social-links/${link.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        throw new Error(data.error ?? res.statusText);
+      }
+      onChanged();
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "Ошибка");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <li className="flex flex-col gap-3 border-b border-zinc-200 py-4 last:border-0 dark:border-zinc-800">
+      <div className="flex flex-wrap items-start gap-3">
+        {link.icon ? (
+          <div className="shrink-0 rounded border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-700 dark:bg-zinc-900">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={link.icon} alt="" className="size-10 object-contain" />
+          </div>
+        ) : (
+          <div className="flex size-10 shrink-0 items-center justify-center rounded border border-dashed border-zinc-300 text-xs text-zinc-400 dark:border-zinc-600">
+            нет
+          </div>
+        )}
+        <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-xs text-zinc-500">Подпись</label>
+            <input
+              type="text"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-zinc-500">Ссылка</label>
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-xs text-zinc-500">
+              Новая иконка (JPEG, PNG, WebP, GIF, SVG, до 5 МБ)
+            </label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,.svg"
+              onChange={(e) => setIconFile(e.target.files?.[0] ?? null)}
+              className="w-full text-xs file:mr-2 file:rounded file:border-0 file:bg-zinc-200 file:px-2 file:py-1 dark:file:bg-zinc-700"
+            />
+          </div>
+          <div className="w-24">
+            <label className="mb-1 block text-xs text-zinc-500">Порядок</label>
+            <input
+              type="number"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void save()}
+          className="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600"
+        >
+          Сохранить
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void remove()}
+          className="rounded-lg border border-red-300 px-3 py-2 text-sm text-red-700 dark:border-red-800 dark:text-red-400"
+        >
+          Удалить
+        </button>
+      </div>
+    </li>
+  );
+}
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -143,6 +314,19 @@ export default function AdminPage() {
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(
     null,
   );
+
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [siteLoading, setSiteLoading] = useState(true);
+  const [siteSaving, setSiteSaving] = useState(false);
+
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [socialLoading, setSocialLoading] = useState(true);
+  const [newSocialLabel, setNewSocialLabel] = useState("");
+  const [newSocialUrl, setNewSocialUrl] = useState("");
+  const [newSocialSort, setNewSocialSort] = useState("0");
+  const [newSocialFile, setNewSocialFile] = useState<File | null>(null);
+  const [socialSaving, setSocialSaving] = useState(false);
 
   const loadCategories = useCallback(async () => {
     setCatLoading(true);
@@ -182,10 +366,51 @@ export default function AdminPage() {
     }
   }, []);
 
+  const loadSiteSettings = useCallback(async () => {
+    setSiteLoading(true);
+    try {
+      const res = await fetch("/api/site-settings");
+      if (!res.ok) {
+        throw new Error("Не удалось загрузить настройки");
+      }
+      const data = (await res.json()) as { phone: string; address: string };
+      setPhone(data.phone ?? "");
+      setAddress(data.address ?? "");
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Ошибка настроек",
+      });
+    } finally {
+      setSiteLoading(false);
+    }
+  }, []);
+
+  const loadSocialLinks = useCallback(async () => {
+    setSocialLoading(true);
+    try {
+      const res = await fetch("/api/social-links");
+      if (!res.ok) {
+        throw new Error("Не удалось загрузить соцсети");
+      }
+      const data = (await res.json()) as SocialLink[];
+      setSocialLinks(data);
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Ошибка соцсетей",
+      });
+    } finally {
+      setSocialLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     void loadCategories();
     void loadItems();
-  }, [loadCategories, loadItems]);
+    void loadSiteSettings();
+    void loadSocialLinks();
+  }, [loadCategories, loadItems, loadSiteSettings, loadSocialLinks]);
 
   async function handleAddCategory(e: React.FormEvent) {
     e.preventDefault();
@@ -265,6 +490,79 @@ export default function AdminPage() {
     }
   }
 
+  async function handleSaveSiteSettings(e: React.FormEvent) {
+    e.preventDefault();
+    setMessage(null);
+    setSiteSaving(true);
+    try {
+      const res = await fetch("/api/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          phone: phone.trim(),
+          address: address.trim(),
+        }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? res.statusText);
+      }
+      setMessage({ type: "ok", text: "Контакты в подвале сохранены" });
+      await loadSiteSettings();
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Ошибка сохранения",
+      });
+    } finally {
+      setSiteSaving(false);
+    }
+  }
+
+  async function handleAddSocial(e: React.FormEvent) {
+    e.preventDefault();
+    setMessage(null);
+    const lab = newSocialLabel.trim();
+    const u = newSocialUrl.trim();
+    if (!lab || !u) {
+      setMessage({ type: "err", text: "Укажите подпись и ссылку" });
+      return;
+    }
+    setSocialSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append("label", lab);
+      fd.append("url", u);
+      fd.append("sortOrder", newSocialSort);
+      if (newSocialFile) {
+        fd.append("icon", newSocialFile);
+      }
+      const res = await fetch("/api/social-links", {
+        method: "POST",
+        body: fd,
+        credentials: "include",
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? res.statusText);
+      }
+      setNewSocialLabel("");
+      setNewSocialUrl("");
+      setNewSocialSort("0");
+      setNewSocialFile(null);
+      setMessage({ type: "ok", text: "Соцсеть добавлена" });
+      await loadSocialLinks();
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Ошибка",
+      });
+    } finally {
+      setSocialSaving(false);
+    }
+  }
+
   async function patchItemCategory(itemId: number, categoryId: string) {
     setMessage(null);
     try {
@@ -320,6 +618,143 @@ export default function AdminPage() {
           Выйти
         </button>
       </div>
+
+      <section className="mb-10">
+        <h2 className="mb-3 text-lg font-medium">Подвал сайта</h2>
+        <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+          Телефон и адрес показываются внизу каждой страницы. Соцсети — с иконкой (файл до 5 МБ).
+        </p>
+
+        {siteLoading ? (
+          <p className="mb-6 text-sm text-zinc-500">Загрузка контактов…</p>
+        ) : (
+          <form
+            onSubmit={handleSaveSiteSettings}
+            className="mb-8 space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80"
+          >
+            <div>
+              <label htmlFor="site-phone" className="mb-1 block text-sm font-medium">
+                Телефон
+              </label>
+              <input
+                id="site-phone"
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+7 (900) 000-00-00"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              />
+            </div>
+            <div>
+              <label htmlFor="site-address" className="mb-1 block text-sm font-medium">
+                Адрес
+              </label>
+              <textarea
+                id="site-address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                rows={3}
+                placeholder="Полный адрес, как на сайте"
+                className="w-full resize-y rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={siteSaving}
+              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+            >
+              {siteSaving ? "Сохранение…" : "Сохранить контакты"}
+            </button>
+          </form>
+        )}
+
+        <h3 className="mb-3 text-base font-medium">Соцсети</h3>
+        <form
+          onSubmit={handleAddSocial}
+          className="mb-6 flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80"
+        >
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label htmlFor="soc-label" className="mb-1 block text-sm font-medium">
+                Подпись
+              </label>
+              <input
+                id="soc-label"
+                type="text"
+                value={newSocialLabel}
+                onChange={(e) => setNewSocialLabel(e.target.value)}
+                placeholder="Например, Telegram"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              />
+            </div>
+            <div>
+              <label htmlFor="soc-url" className="mb-1 block text-sm font-medium">
+                Ссылка
+              </label>
+              <input
+                id="soc-url"
+                type="url"
+                value={newSocialUrl}
+                onChange={(e) => setNewSocialUrl(e.target.value)}
+                placeholder="https://"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="w-full sm:w-28">
+              <label htmlFor="soc-sort" className="mb-1 block text-sm font-medium">
+                Порядок
+              </label>
+              <input
+                id="soc-sort"
+                type="number"
+                value={newSocialSort}
+                onChange={(e) => setNewSocialSort(e.target.value)}
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <label htmlFor="soc-icon" className="mb-1 block text-sm font-medium">
+                Иконка (необязательно)
+              </label>
+              <input
+                id="soc-icon"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,.svg"
+                onChange={(e) => setNewSocialFile(e.target.files?.[0] ?? null)}
+                className="w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-zinc-200 file:px-3 file:py-1.5 dark:file:bg-zinc-700"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={socialSaving}
+              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+            >
+              {socialSaving ? "…" : "Добавить"}
+            </button>
+          </div>
+        </form>
+
+        {socialLoading ? (
+          <p className="text-sm text-zinc-500">Загрузка соцсетей…</p>
+        ) : socialLinks.length === 0 ? (
+          <p className="text-sm text-zinc-500">Соцсетей пока нет.</p>
+        ) : (
+          <ul className="rounded-xl border border-zinc-200 px-4 dark:border-zinc-800">
+            {socialLinks.map((sl) => (
+              <SocialLinkRow
+                key={sl.id}
+                link={sl}
+                onChanged={() => {
+                  void loadSocialLinks();
+                }}
+                onError={(text) => setMessage({ type: "err", text })}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className="mb-10">
         <h2 className="mb-3 text-lg font-medium">Категории</h2>

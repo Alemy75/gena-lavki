@@ -34,3 +34,21 @@ model CatalogItem {
 
   @@map("catalog_item")
 }
+
+model SiteSettings {
+  id      Int    @id @default(1)
+  phone   String @default("")
+  address String @default("")
+
+  @@map("site_settings")
+}
+
+model SocialLink {
+  id        Int    @id @default(autoincrement())
+  label     String
+  url       String
+  icon      String @default("")
+  sortOrder Int    @default(0)
+
+  @@map("social_link")
+}

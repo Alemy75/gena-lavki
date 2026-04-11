@@ -94,6 +94,31 @@ async function main() {
 
   await prisma.catalogItem.deleteMany();
   await prisma.category.deleteMany();
+  await prisma.socialLink.deleteMany();
+
+  const demoPhone = "+7 (900) 000-00-00";
+  const demoAddress = "г. Москва, ул. Примерная, д. 1";
+  const settingsRow = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  if (!settingsRow) {
+    await prisma.siteSettings.create({
+      data: { id: 1, phone: demoPhone, address: demoAddress },
+    });
+  } else if (!settingsRow.phone.trim() && !settingsRow.address.trim()) {
+    await prisma.siteSettings.update({
+      where: { id: 1 },
+      data: { phone: demoPhone, address: demoAddress },
+    });
+  }
+
+  await prisma.socialLink.create({
+    data: {
+      label: "WhatsApp",
+      url: "https://wa.me/79000000000",
+      icon: "/icons/whatsapp.svg",
+      sortOrder: 0,
+    },
+  });
+  console.log("Seeded site settings + WhatsApp link");
 
   for (const c of categoryDefs) {
     await prisma.category.create({ data: c });
