@@ -42,6 +42,7 @@ export async function POST(request: Request) {
   }
 
   const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
   const file = formData.get("image");
 
   if (!name) {
@@ -85,7 +86,7 @@ export async function POST(request: Request) {
 
   try {
     const item = await prisma.catalogItem.create({
-      data: { name, image: publicPath },
+      data: { name, description, image: publicPath },
     });
     return NextResponse.json(item, { status: 201 });
   } catch (error) {

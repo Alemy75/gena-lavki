@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 type CatalogItem = {
   id: number;
   name: string;
+  description: string;
   image: string;
   createdAt: string;
 };
@@ -13,6 +14,7 @@ type CatalogItem = {
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +57,7 @@ export default function AdminPage() {
     try {
       const formData = new FormData();
       formData.append("name", name.trim());
+      formData.append("description", description.trim());
       formData.append("image", file);
       const res = await fetch("/api/catalog-items", {
         method: "POST",
@@ -66,6 +69,7 @@ export default function AdminPage() {
         throw new Error(data.error ?? res.statusText);
       }
       setName("");
+      setDescription("");
       setFile(null);
       setMessage({ type: "ok", text: "Позиция добавлена" });
       await loadItems();
@@ -110,7 +114,8 @@ export default function AdminPage() {
       </div>
 
       <p className="mb-8 text-sm text-zinc-600 dark:text-zinc-400">
-        Добавление позиций: название и файл картинки (до 5 МБ, JPEG/PNG/WebP/GIF).
+        Добавление позиций: название, описание (необязательно) и файл картинки (до 5 МБ,
+        JPEG/PNG/WebP/GIF).
       </p>
 
       <form
@@ -128,6 +133,19 @@ export default function AdminPage() {
             onChange={(e) => setName(e.target.value)}
             required
             className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          />
+        </div>
+        <div>
+          <label htmlFor="item-description" className="mb-1 block text-sm font-medium">
+            Описание
+          </label>
+          <textarea
+            id="item-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            placeholder="Текст для страницы позиции"
+            className="w-full resize-y rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
           />
         </div>
         <div>
@@ -181,7 +199,14 @@ export default function AdminPage() {
                   alt=""
                   className="size-10 shrink-0 rounded object-cover"
                 />
-                <span className="min-w-0 flex-1 font-medium">{item.name}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium">{item.name}</span>
+                  {item.description.trim() ? (
+                    <span className="mt-0.5 line-clamp-2 block text-xs font-normal text-zinc-500 dark:text-zinc-400">
+                      {item.description}
+                    </span>
+                  ) : null}
+                </span>
                 <span className="shrink-0 text-zinc-400">#{item.id}</span>
               </li>
             ))}
