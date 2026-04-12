@@ -1,3 +1,4 @@
+import { ContactCta } from "@/components/contact-cta";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -109,6 +110,7 @@ export default async function Home({ searchParams }: PageProps) {
             В этой категории пока нет позиций.
           </p>
         ) : null}
+        <ContactCta />
       </div>
     </div>
   );

@@ -52,3 +52,15 @@ model SocialLink {
 
   @@map("social_link")
 }
+
+/// Заявки с формы, если SMTP недоступен и включён CONTACT_SAVE_IF_MAIL_FAILS
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  name      String
+  email     String
+  phone     String
+  consent   Boolean
+
+  @@map("contact_message")
+}

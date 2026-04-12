@@ -1,1 +1,58 @@
 @import "tailwindcss";
+
+@layer components {
+  /* Закрытый <dialog> должен оставаться display:none; не добавляйте на него безусловный Tailwind `flex`. */
+  .contact-dialog:not([open]) {
+    display: none;
+  }
+
+  .contact-dialog[open] {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 50;
+    margin: 0;
+    max-height: min(90dvh, 40rem);
+    width: min(calc(100vw - 2rem), 28rem);
+    transform: translate(-50%, -50%);
+    border-width: 1px;
+    padding: 0;
+    overflow-y: auto;
+    box-shadow:
+      0 25px 50px -12px rgb(0 0 0 / 0.25),
+      0 0 0 1px rgb(0 0 0 / 0.05);
+    animation: contact-dialog-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes contact-dialog-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  .contact-dialog::backdrop {
+    background: rgb(0 0 0 / 0.72);
+    animation: contact-backdrop-in 0.22s ease-out;
+  }
+
+  @keyframes contact-backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .contact-dialog[open],
+    .contact-dialog::backdrop {
+      animation: none;
+    }
+  }
+}
