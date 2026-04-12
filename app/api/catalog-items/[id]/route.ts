@@ -53,7 +53,10 @@ export async function PATCH(request: Request, context: RouteContext) {
     const item = await prisma.catalogItem.update({
       where: { id: itemId },
       data: { categoryId },
-      include: { category: true },
+      include: {
+        category: true,
+        images: { orderBy: { sortOrder: "asc" } },
+      },
     });
     return NextResponse.json(item);
   } catch (error) {

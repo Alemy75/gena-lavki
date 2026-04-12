@@ -49,7 +49,7 @@ export default function RootLayout({
             </nav>
           </div>
         </header>
-        <main className="flex min-h-[100dvh] flex-1 flex-col">{children}</main>
+        <main className="flex min-h-[100dvh] w-full min-w-0 flex-1 flex-col">{children}</main>
         <div className="shrink-0">
           <SiteFooter />
         </div>

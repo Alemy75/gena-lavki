@@ -1,14 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { CatalogItem, Category } from "../types";
+import type { CatalogItem, CatalogItemImage, Category } from "../types";
+
+function sortedImages(item: CatalogItem): CatalogItemImage[] {
+  const list = item.images;
+  if (!list || list.length === 0) {
+    return [];
+  }
+  return [...list].sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+function coverUrl(item: CatalogItem): string {
+  const imgs = sortedImages(item);
+  return imgs[0]?.url ?? item.image;
+}
 
 export default function AdminItemsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [itemCategoryId, setItemCategoryId] = useState<string>("");
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -59,8 +72,8 @@ export default function AdminItemsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
-    if (!file) {
-      setMessage({ type: "err", text: "Выберите файл изображения" });
+    if (files.length === 0) {
+      setMessage({ type: "err", text: "Выберите хотя бы одно изображение" });
       return;
     }
     setSaving(true);
@@ -68,7 +81,9 @@ export default function AdminItemsPage() {
       const formData = new FormData();
       formData.append("name", name.trim());
       formData.append("description", description.trim());
-      formData.append("image", file);
+      for (const f of files) {
+        formData.append("images", f);
+      }
       if (itemCategoryId !== "") {
         formData.append("categoryId", itemCategoryId);
       }
@@ -84,7 +99,7 @@ export default function AdminItemsPage() {
       setName("");
       setDescription("");
       setItemCategoryId("");
-      setFile(null);
+      setFiles([]);
       setMessage({ type: "ok", text: "Позиция добавлена" });
       await loadItems();
     } catch (e) {
@@ -94,6 +109,54 @@ export default function AdminItemsPage() {
       });
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function addPhotosToItem(itemId: number, fileList: FileList | null) {
+    if (!fileList?.length) {
+      return;
+    }
+    setMessage(null);
+    try {
+      const formData = new FormData();
+      for (const f of Array.from(fileList)) {
+        formData.append("images", f);
+      }
+      const res = await fetch(`/api/catalog-items/${itemId}/images`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? res.statusText);
+      }
+      await loadItems();
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Не удалось добавить фото",
+      });
+    }
+  }
+
+  async function deleteItemImage(itemId: number, imageId: number) {
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/catalog-items/${itemId}/images/${imageId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? res.statusText);
+      }
+      await loadItems();
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Не удалось удалить фото",
+      });
     }
   }
 
@@ -127,8 +190,8 @@ export default function AdminItemsPage() {
     <div>
       <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">Позиции</h2>
       <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
-        Добавление: название, описание (необязательно), категория (необязательно) и файл картинки (до
-        5 МБ, JPEG/PNG/WebP/GIF).
+        Добавление: название, описание (необязательно), категория (необязательно) и одно или несколько
+        изображений (до 5 МБ каждое, JPEG/PNG/WebP/GIF). Первое фото — обложка в списке.
       </p>
 
       <form
@@ -181,14 +244,17 @@ export default function AdminItemsPage() {
         </div>
         <div>
           <label htmlFor="item-image" className="mb-1 block text-sm font-medium">
-            Изображение
+            Изображения
           </label>
           <input
             id="item-image"
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
             required
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            onChange={(e) =>
+              setFiles(e.target.files ? Array.from(e.target.files) : [])
+            }
             className="w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-zinc-200 file:px-3 file:py-1.5 dark:file:bg-zinc-700"
           />
         </div>
@@ -224,17 +290,56 @@ export default function AdminItemsPage() {
           <p className="text-sm text-zinc-500">Загрузка списка…</p>
         ) : (
           <ul className="divide-y divide-zinc-200 rounded-xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
-            {items.map((item) => (
+            {items.map((item) => {
+              const imgs = sortedImages(item);
+              return (
               <li
                 key={item.id}
-                className="flex flex-col gap-3 px-4 py-3 text-sm first:rounded-t-xl last:rounded-b-xl sm:flex-row sm:items-center"
+                className="flex flex-col gap-3 px-4 py-3 text-sm first:rounded-t-xl last:rounded-b-xl sm:flex-row sm:items-start"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={item.image}
-                  alt=""
-                  className="size-10 shrink-0 rounded object-cover"
-                />
+                <div className="flex shrink-0 flex-col gap-1.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={coverUrl(item)}
+                    alt=""
+                    className="size-10 rounded object-cover"
+                  />
+                  {imgs.length > 1 ? (
+                    <ul className="flex max-w-[140px] flex-wrap gap-1">
+                      {imgs.map((im) => (
+                        <li key={im.id} className="relative">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={im.url}
+                            alt=""
+                            className="size-7 rounded object-cover ring-1 ring-zinc-200 dark:ring-zinc-600"
+                          />
+                          <button
+                            type="button"
+                            title="Удалить фото"
+                            onClick={() => void deleteItemImage(item.id, im.id)}
+                            className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold leading-none text-white shadow disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            ×
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <label className="cursor-pointer text-xs text-zinc-500 underline hover:text-zinc-800 dark:hover:text-zinc-200">
+                    + фото
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      multiple
+                      className="sr-only"
+                      onChange={(e) => {
+                        void addPhotosToItem(item.id, e.target.files);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                </div>
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">{item.name}</span>
                   {item.description.trim() ? (
@@ -243,7 +348,7 @@ export default function AdminItemsPage() {
                     </span>
                   ) : null}
                 </span>
-                <div className="flex shrink-0 items-center gap-2 sm:w-56">
+                <div className="flex shrink-0 items-center gap-2 sm:w-56 sm:self-center">
                   <label htmlFor={`cat-${item.id}`} className="sr-only">
                     Категория для {item.name}
                   </label>
@@ -261,9 +366,10 @@ export default function AdminItemsPage() {
                     ))}
                   </select>
                 </div>
-                <span className="shrink-0 text-zinc-400">#{item.id}</span>
+                <span className="shrink-0 self-center text-zinc-400">#{item.id}</span>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </section>

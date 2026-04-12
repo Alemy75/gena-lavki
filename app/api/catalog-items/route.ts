@@ -1,17 +1,24 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { randomBytes } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
+import { saveUploadedImageFile, validateImageFile } from "@/lib/save-uploaded-image";
 import { NextResponse } from "next/server";
-import path from "path";
 
-const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]);
+const imagesInclude = {
+  images: { orderBy: { sortOrder: "asc" as const } },
+  category: true,
+};
+
+function collectImageFiles(formData: FormData): File[] {
+  const fromImages = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
+  if (fromImages.length > 0) {
+    return fromImages;
+  }
+  const single = formData.get("image");
+  if (single instanceof File && single.size > 0) {
+    return [single];
+  }
+  return [];
+}
 
 export async function GET(request: Request) {
   try {
@@ -30,7 +37,7 @@ export async function GET(request: Request) {
       where:
         categoryIdFilter !== undefined ? { categoryId: categoryIdFilter } : undefined,
       orderBy: { id: "asc" },
-      include: { category: true },
+      include: imagesInclude,
     });
     return NextResponse.json(items);
   } catch (error) {
@@ -58,7 +65,7 @@ export async function POST(request: Request) {
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const categoryIdRaw = formData.get("categoryId");
-  const file = formData.get("image");
+  const files = collectImageFiles(formData);
 
   let categoryId: number | null = null;
   if (categoryIdRaw !== null && String(categoryIdRaw).trim() !== "") {
@@ -77,45 +84,42 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Укажите название" }, { status: 400 });
   }
 
-  if (!(file instanceof File) || file.size === 0) {
-    return NextResponse.json({ error: "Выберите файл изображения" }, { status: 400 });
-  }
-
-  if (file.size > MAX_BYTES) {
+  if (files.length === 0) {
     return NextResponse.json(
-      { error: "Файл больше 5 МБ" },
+      { error: "Выберите хотя бы одно изображение" },
       { status: 400 },
     );
   }
 
-  if (!ALLOWED_TYPES.has(file.type)) {
-    return NextResponse.json(
-      { error: "Допустимы только JPEG, PNG, WebP, GIF" },
-      { status: 400 },
-    );
+  for (const file of files) {
+    const err = validateImageFile(file);
+    if (err) {
+      return NextResponse.json({ error: err }, { status: 400 });
+    }
   }
 
-  const ext =
-    {
-      "image/jpeg": ".jpg",
-      "image/png": ".png",
-      "image/webp": ".webp",
-      "image/gif": ".gif",
-    }[file.type] ?? ".jpg";
+  let publicPaths: string[];
+  try {
+    publicPaths = await Promise.all(files.map((f) => saveUploadedImageFile(f)));
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Ошибка загрузки файла";
+    return NextResponse.json({ error: msg }, { status: 400 });
+  }
 
-  const filename = `${Date.now()}-${randomBytes(8).toString("hex")}${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, filename), buffer);
-
-  const publicPath = `/uploads/${filename}`;
+  const coverUrl = publicPaths[0]!;
 
   try {
     const item = await prisma.catalogItem.create({
-      data: { name, description, image: publicPath, categoryId },
-      include: { category: true },
+      data: {
+        name,
+        description,
+        image: coverUrl,
+        categoryId,
+        images: {
+          create: publicPaths.map((url, sortOrder) => ({ url, sortOrder })),
+        },
+      },
+      include: imagesInclude,
     });
     return NextResponse.json(item, { status: 201 });
   } catch (error) {

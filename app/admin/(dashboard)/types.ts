@@ -4,6 +4,13 @@ export type Category = {
   sortOrder: number;
 };
 
+export type CatalogItemImage = {
+  id: number;
+  catalogItemId: number;
+  url: string;
+  sortOrder: number;
+};
+
 export type CatalogItem = {
   id: number;
   name: string;
@@ -12,6 +19,7 @@ export type CatalogItem = {
   createdAt: string;
   categoryId: number | null;
   category: { id: number; name: string } | null;
+  images?: CatalogItemImage[];
 };
 
 export type SocialLink = {

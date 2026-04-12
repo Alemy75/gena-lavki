@@ -128,17 +128,20 @@ async function main() {
   });
   console.log(`Seeded ${categories.length} categories`);
 
-  const rows = mockItems.map((item) => {
+  for (const item of mockItems) {
     const cat = categories[item.categoryIndex];
-    return {
-      name: item.name,
-      description: item.description,
-      image: item.image,
-      categoryId: cat ? cat.id : null,
-    };
-  });
-
-  await prisma.catalogItem.createMany({ data: rows });
+    await prisma.catalogItem.create({
+      data: {
+        name: item.name,
+        description: item.description,
+        image: item.image,
+        categoryId: cat ? cat.id : null,
+        images: {
+          create: [{ url: item.image, sortOrder: 0 }],
+        },
+      },
+    });
+  }
 }
 
 main()

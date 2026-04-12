@@ -24,15 +24,27 @@ model Category {
 }
 
 model CatalogItem {
-  id          Int       @id @default(autoincrement())
+  id          Int                 @id @default(autoincrement())
   name        String
-  description String    @default("")
+  description String              @default("")
   image       String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime            @default(now())
   categoryId  Int?
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category    Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  images      CatalogItemImage[]
 
   @@map("catalog_item")
+}
+
+model CatalogItemImage {
+  id            Int         @id @default(autoincrement())
+  catalogItemId Int
+  url           String
+  sortOrder     Int         @default(0)
+  catalogItem   CatalogItem @relation(fields: [catalogItemId], references: [id], onDelete: Cascade)
+
+  @@index([catalogItemId])
+  @@map("catalog_item_image")
 }
 
 model SiteSettings {

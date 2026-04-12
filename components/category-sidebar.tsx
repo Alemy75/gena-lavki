@@ -10,7 +10,7 @@ export function CategorySidebar({
   activeCategoryId: number | null;
 }) {
   return (
-    <aside className="shrink-0 md:w-52">
+    <aside className="w-full shrink-0 md:w-52">
       <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
         Категории
       </h2>
