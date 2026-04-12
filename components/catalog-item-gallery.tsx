@@ -28,29 +28,25 @@ export function CatalogItemGallery({ urls, alt }: Props) {
       </div>
       {list.length > 1 ? (
         <ul
-          className="mt-3 flex flex-wrap gap-2"
+          className="mt-3 grid grid-cols-6 gap-1.5 sm:gap-2"
           role="tablist"
           aria-label="Дополнительные фото"
         >
           {list.map((url, i) => (
-            <li key={`${url}-${i}`}>
+            <li key={`${url}-${i}`} className="aspect-square min-w-0">
               <button
                 type="button"
                 role="tab"
                 aria-selected={i === safeIndex}
                 onClick={() => setActive(i)}
-                className={
+                className={`h-full w-full overflow-hidden rounded-md ${
                   i === safeIndex
                     ? "ring-2 ring-zinc-900 ring-offset-2 ring-offset-white dark:ring-zinc-100 dark:ring-offset-zinc-900"
-                    : "opacity-80 hover:opacity-100"
-                }
+                    : "opacity-80 ring-1 ring-zinc-200 hover:opacity-100 dark:ring-zinc-600"
+                }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={url}
-                  alt=""
-                  className="size-14 rounded-md object-cover sm:size-16"
-                />
+                <img src={url} alt="" className="h-full w-full object-cover" />
               </button>
             </li>
           ))}

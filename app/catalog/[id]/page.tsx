@@ -95,7 +95,7 @@ export default async function CatalogItemPage({ params }: PageProps) {
             )}
           </div>
 
-          <div className="mx-auto w-full max-w-[220px] shrink-0 sm:max-w-[260px] md:order-2 md:mx-0 md:max-w-[min(100%,280px)]">
+          <div className="mx-auto w-full max-w-[min(100%,360px)] shrink-0 md:order-2 md:mx-0">
             <CatalogItemGallery urls={galleryUrls} alt={item.name} />
           </div>
         </div>
