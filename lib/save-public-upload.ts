@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
+
+import { storeUpload } from "@/lib/upload-storage";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = new Set([
@@ -19,7 +19,7 @@ const EXT: Record<string, string> = {
   "image/svg+xml": ".svg",
 };
 
-/** Saves to `public/uploads/`. Returns public path `/uploads/...` or error message. */
+/** Сохраняет файл (Vercel Blob или локально). Возвращает публичный путь или ошибку. */
 export async function savePublicUpload(
   file: File,
 ): Promise<{ ok: true; publicPath: string } | { ok: false; error: string }> {
@@ -38,11 +38,8 @@ export async function savePublicUpload(
 
   const ext = EXT[file.type] ?? ".bin";
   const filename = `${Date.now()}-${randomBytes(8).toString("hex")}${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
-
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, filename), buffer);
+  const publicPath = await storeUpload(filename, buffer, file.type);
 
-  return { ok: true, publicPath: `/uploads/${filename}` };
+  return { ok: true, publicPath };
 }
