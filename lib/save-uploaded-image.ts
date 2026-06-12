@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
-
-import { storeUpload } from "@/lib/upload-storage";
+import { mkdir, writeFile } from "fs/promises";
+import path from "path";
 
 export const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export const IMAGE_ALLOWED_TYPES = new Set([
@@ -30,7 +30,7 @@ export function validateImageFile(file: File): string | null {
   return null;
 }
 
-/** Сохраняет файл и возвращает публичный URL (Vercel Blob или локальный `/uploads/...`). */
+/** Сохраняет файл в public/uploads, возвращает публичный URL `/uploads/...` */
 export async function saveUploadedImageFile(file: File): Promise<string> {
   const err = validateImageFile(file);
   if (err) {
@@ -38,6 +38,9 @@ export async function saveUploadedImageFile(file: File): Promise<string> {
   }
   const ext = EXT_BY_TYPE[file.type] ?? ".jpg";
   const filename = `${Date.now()}-${randomBytes(8).toString("hex")}${ext}`;
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  await mkdir(uploadDir, { recursive: true });
   const buffer = Buffer.from(await file.arrayBuffer());
-  return storeUpload(filename, buffer, file.type);
+  await writeFile(path.join(uploadDir, filename), buffer);
+  return `/uploads/${filename}`;
 }
