@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   description: "Каталог товаров",
 };
 
+// Все страницы читают БД (настройки сайта, соцссылки в футере) — рендерим
+// только на запрос, без пререндера при `next build` (при сборке БД нет).
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({
   children,
 }: Readonly<{
