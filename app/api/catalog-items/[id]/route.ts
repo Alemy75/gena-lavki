@@ -27,32 +27,50 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  if (typeof body !== "object" || body === null || !("categoryId" in body)) {
-    return NextResponse.json({ error: "Ожидается categoryId" }, { status: 400 });
+  if (typeof body !== "object" || body === null) {
+    return NextResponse.json({ error: "Ожидается объект" }, { status: 400 });
   }
 
-  const raw = (body as { categoryId: unknown }).categoryId;
-  let categoryId: number | null;
-  if (raw === null) {
-    categoryId = null;
-  } else if (typeof raw === "number" && Number.isFinite(raw)) {
-    const n = Math.trunc(raw);
-    if (n < 1) {
-      return NextResponse.json({ error: "Некорректная категория" }, { status: 400 });
+  const data: { categoryId?: number | null; description?: string } = {};
+
+  if ("categoryId" in body) {
+    const raw = (body as { categoryId: unknown }).categoryId;
+    if (raw === null) {
+      data.categoryId = null;
+    } else if (typeof raw === "number" && Number.isFinite(raw)) {
+      const n = Math.trunc(raw);
+      if (n < 1) {
+        return NextResponse.json({ error: "Некорректная категория" }, { status: 400 });
+      }
+      const exists = await prisma.category.findUnique({ where: { id: n } });
+      if (!exists) {
+        return NextResponse.json({ error: "Категория не найдена" }, { status: 400 });
+      }
+      data.categoryId = n;
+    } else {
+      return NextResponse.json({ error: "Некорректный categoryId" }, { status: 400 });
     }
-    const exists = await prisma.category.findUnique({ where: { id: n } });
-    if (!exists) {
-      return NextResponse.json({ error: "Категория не найдена" }, { status: 400 });
+  }
+
+  if ("description" in body) {
+    const raw = (body as { description: unknown }).description;
+    if (typeof raw !== "string") {
+      return NextResponse.json({ error: "Некорректное описание" }, { status: 400 });
     }
-    categoryId = n;
-  } else {
-    return NextResponse.json({ error: "Некорректный categoryId" }, { status: 400 });
+    if (raw.length > 20_000) {
+      return NextResponse.json({ error: "Описание слишком длинное" }, { status: 400 });
+    }
+    data.description = raw.trim();
+  }
+
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json({ error: "Нет полей для обновления" }, { status: 400 });
   }
 
   try {
     const item = await prisma.catalogItem.update({
       where: { id: itemId },
-      data: { categoryId },
+      data,
       include: {
         category: true,
         images: { orderBy: { sortOrder: "asc" } },

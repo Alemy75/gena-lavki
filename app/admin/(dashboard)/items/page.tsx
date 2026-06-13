@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { CatalogItem, CatalogItemImage, Category } from "../types";
+import { MarkdownEditor } from "@/components/markdown-editor";
 
 function sortedImages(item: CatalogItem): CatalogItemImage[] {
   const list = item.images;
@@ -25,6 +26,9 @@ export default function AdminItemsPage() {
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingDesc, setEditingDesc] = useState("");
+  const [savingDesc, setSavingDesc] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(
     null,
   );
@@ -160,6 +164,34 @@ export default function AdminItemsPage() {
     }
   }
 
+  async function saveItemDescription(itemId: number) {
+    setMessage(null);
+    setSavingDesc(true);
+    try {
+      const res = await fetch(`/api/catalog-items/${itemId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ description: editingDesc }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? res.statusText);
+      }
+      setEditingId(null);
+      setEditingDesc("");
+      setMessage({ type: "ok", text: "Описание сохранено" });
+      await loadItems();
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Не удалось сохранить описание",
+      });
+    } finally {
+      setSavingDesc(false);
+    }
+  }
+
   async function patchItemCategory(itemId: number, categoryId: string) {
     setMessage(null);
     try {
@@ -215,14 +247,7 @@ export default function AdminItemsPage() {
           <label htmlFor="item-description" className="mb-1 block text-sm font-medium">
             Описание
           </label>
-          <textarea
-            id="item-description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={4}
-            placeholder="Текст для страницы позиции"
-            className="w-full resize-y rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-          />
+          <MarkdownEditor id="item-description" value={description} onChange={setDescription} />
         </div>
         <div>
           <label htmlFor="item-category" className="mb-1 block text-sm font-medium">
@@ -295,8 +320,9 @@ export default function AdminItemsPage() {
               return (
               <li
                 key={item.id}
-                className="flex flex-col gap-3 px-4 py-3 text-sm first:rounded-t-xl last:rounded-b-xl sm:flex-row sm:items-start"
+                className="flex flex-col gap-3 px-4 py-3 text-sm first:rounded-t-xl last:rounded-b-xl"
               >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                 <div className="flex shrink-0 flex-col gap-1.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -347,6 +373,16 @@ export default function AdminItemsPage() {
                       {item.description}
                     </span>
                   ) : null}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingId(editingId === item.id ? null : item.id);
+                      setEditingDesc(item.description);
+                    }}
+                    className="mt-1 text-xs text-zinc-500 underline hover:text-zinc-800 dark:hover:text-zinc-200"
+                  >
+                    {editingId === item.id ? "Свернуть" : "Редактировать описание"}
+                  </button>
                 </span>
                 <div className="flex shrink-0 items-center gap-2 sm:w-56 sm:self-center">
                   <label htmlFor={`cat-${item.id}`} className="sr-only">
@@ -367,6 +403,36 @@ export default function AdminItemsPage() {
                   </select>
                 </div>
                 <span className="shrink-0 self-center text-zinc-400">#{item.id}</span>
+                </div>
+                {editingId === item.id ? (
+                  <div className="space-y-2">
+                    <MarkdownEditor
+                      value={editingDesc}
+                      onChange={setEditingDesc}
+                      rows={8}
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        disabled={savingDesc}
+                        onClick={() => void saveItemDescription(item.id)}
+                        className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+                      >
+                        {savingDesc ? "Сохранение…" : "Сохранить описание"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingId(null);
+                          setEditingDesc("");
+                        }}
+                        className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                      >
+                        Отмена
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </li>
               );
             })}

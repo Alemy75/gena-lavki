@@ -1,6 +1,7 @@
 import { CatalogItemGallery } from "@/components/catalog-item-gallery";
 import { CatalogPageShell } from "@/components/catalog-page-shell";
 import { CategorySidebar } from "@/components/category-sidebar";
+import { Markdown } from "@/components/markdown";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -85,8 +86,8 @@ export default async function CatalogItemPage({ params }: PageProps) {
               {item.name}
             </h1>
             {item.description.trim() ? (
-              <div className="mt-4 whitespace-pre-wrap text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
-                {item.description}
+              <div className="mt-4">
+                <Markdown>{item.description}</Markdown>
               </div>
             ) : (
               <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
