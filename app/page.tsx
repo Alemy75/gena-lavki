@@ -1,6 +1,7 @@
 import { CatalogPageShell } from "@/components/catalog-page-shell";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { ContactCta } from "@/components/contact-cta";
+import { HeroBanner } from "@/components/hero-banner";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -40,13 +41,14 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <CatalogPageShell
+      hero={activeCategoryId === null ? <HeroBanner /> : undefined}
       sidebar={
         <CategorySidebar categories={categories} activeCategoryId={activeCategoryId} />
       }
     >
-      <h1 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+      <h2 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         Позиции каталога
-      </h1>
+      </h2>
       <ul className="grid w-full list-none gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item: Item) => (
           <li key={item.id}>
