@@ -9,9 +9,9 @@ const prisma = new PrismaClient();
 const SD_CATEGORY = "Скамейки с натуральным деревом";
 const SD_NAME = "Скамья СД";
 const SD_IMAGE = "/hero-bench.png"; // заглушка; замените фото через админку («+ фото»)
-const SD_DESCRIPTION = `**Скамья садовая разборная.** Доступна в двух модификациях.
+const SD_DESCRIPTION = `**Скамья садовая разборная.** Надёжная и прочная модель из профильной стальной трубы с деревянным настилом. Доступна в двух модификациях — характеристики ниже.`;
 
-## Модификация БМ-01.2
+const SD_SPECS = `## Модификация БМ-01.2
 
 | Характеристика | Значение |
 | --- | --- |
@@ -102,7 +102,7 @@ async function main() {
   if (existing) {
     await prisma.catalogItem.update({
       where: { id: existing.id },
-      data: { description: SD_DESCRIPTION, categoryId: category.id },
+      data: { description: SD_DESCRIPTION, specs: SD_SPECS, categoryId: category.id },
     });
     console.log(`Обновлена позиция «${SD_NAME}» (#${existing.id})`);
   } else {
@@ -110,6 +110,7 @@ async function main() {
       data: {
         name: SD_NAME,
         description: SD_DESCRIPTION,
+        specs: SD_SPECS,
         image: SD_IMAGE,
         categoryId: category.id,
         images: { create: [{ url: SD_IMAGE, sortOrder: 0 }] },

@@ -15,6 +15,7 @@ export type CatalogItem = {
   id: number;
   name: string;
   description: string;
+  specs: string;
   image: string;
   createdAt: string;
   categoryId: number | null;

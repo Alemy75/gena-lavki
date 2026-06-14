@@ -102,6 +102,15 @@ export default async function CatalogItemPage({ params }: PageProps) {
             <ProductContactButton product={item.name} />
           </div>
         </div>
+
+        {item.specs.trim() ? (
+          <div className="border-t border-border p-6 sm:p-8">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+              Характеристики
+            </h2>
+            <Markdown>{item.specs}</Markdown>
+          </div>
+        ) : null}
       </article>
     </CatalogPageShell>
   );

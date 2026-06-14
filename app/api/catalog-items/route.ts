@@ -64,6 +64,7 @@ export async function POST(request: Request) {
 
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const specs = String(formData.get("specs") ?? "").trim();
   const categoryIdRaw = formData.get("categoryId");
   const files = collectImageFiles(formData);
 
@@ -113,6 +114,7 @@ export async function POST(request: Request) {
       data: {
         name,
         description,
+        specs,
         image: coverUrl,
         categoryId,
         images: {

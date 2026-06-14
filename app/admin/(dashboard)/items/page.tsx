@@ -21,6 +21,7 @@ export default function AdminItemsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [specs, setSpecs] = useState("");
   const [itemCategoryId, setItemCategoryId] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [items, setItems] = useState<CatalogItem[]>([]);
@@ -28,6 +29,7 @@ export default function AdminItemsPage() {
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingDesc, setEditingDesc] = useState("");
+  const [editingSpecs, setEditingSpecs] = useState("");
   const [savingDesc, setSavingDesc] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(
     null,
@@ -85,6 +87,7 @@ export default function AdminItemsPage() {
       const formData = new FormData();
       formData.append("name", name.trim());
       formData.append("description", description.trim());
+      formData.append("specs", specs.trim());
       for (const f of files) {
         formData.append("images", f);
       }
@@ -102,6 +105,7 @@ export default function AdminItemsPage() {
       }
       setName("");
       setDescription("");
+      setSpecs("");
       setItemCategoryId("");
       setFiles([]);
       setMessage({ type: "ok", text: "Позиция добавлена" });
@@ -181,6 +185,7 @@ export default function AdminItemsPage() {
       if (editingId === itemId) {
         setEditingId(null);
         setEditingDesc("");
+        setEditingSpecs("");
       }
       setMessage({ type: "ok", text: "Позиция удалена" });
       await loadItems();
@@ -192,7 +197,7 @@ export default function AdminItemsPage() {
     }
   }
 
-  async function saveItemDescription(itemId: number) {
+  async function saveItemContent(itemId: number) {
     setMessage(null);
     setSavingDesc(true);
     try {
@@ -200,7 +205,7 @@ export default function AdminItemsPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ description: editingDesc }),
+        body: JSON.stringify({ description: editingDesc, specs: editingSpecs }),
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) {
@@ -208,12 +213,13 @@ export default function AdminItemsPage() {
       }
       setEditingId(null);
       setEditingDesc("");
-      setMessage({ type: "ok", text: "Описание сохранено" });
+      setEditingSpecs("");
+      setMessage({ type: "ok", text: "Сохранено" });
       await loadItems();
     } catch (e) {
       setMessage({
         type: "err",
-        text: e instanceof Error ? e.message : "Не удалось сохранить описание",
+        text: e instanceof Error ? e.message : "Не удалось сохранить",
       });
     } finally {
       setSavingDesc(false);
@@ -276,6 +282,12 @@ export default function AdminItemsPage() {
             Описание
           </label>
           <MarkdownEditor id="item-description" value={description} onChange={setDescription} />
+        </div>
+        <div>
+          <label htmlFor="item-specs" className="mb-1 block text-sm font-medium">
+            Характеристики
+          </label>
+          <MarkdownEditor id="item-specs" value={specs} onChange={setSpecs} />
         </div>
         <div>
           <label htmlFor="item-category" className="mb-1 block text-sm font-medium">
@@ -406,10 +418,11 @@ export default function AdminItemsPage() {
                     onClick={() => {
                       setEditingId(editingId === item.id ? null : item.id);
                       setEditingDesc(item.description);
+                      setEditingSpecs(item.specs ?? "");
                     }}
                     className="mt-1 text-xs text-muted-foreground underline hover:text-foreground"
                   >
-                    {editingId === item.id ? "Свернуть" : "Редактировать описание"}
+                    {editingId === item.id ? "Свернуть" : "Редактировать описание и характеристики"}
                   </button>
                 </span>
                 <div className="flex shrink-0 items-center gap-2 sm:w-56 sm:self-center">
@@ -442,26 +455,38 @@ export default function AdminItemsPage() {
                 </div>
                 </div>
                 {editingId === item.id ? (
-                  <div className="space-y-2">
-                    <MarkdownEditor
-                      value={editingDesc}
-                      onChange={setEditingDesc}
-                      rows={8}
-                    />
+                  <div className="space-y-3">
+                    <div>
+                      <p className="mb-1 text-xs font-medium text-muted-foreground">Описание</p>
+                      <MarkdownEditor
+                        value={editingDesc}
+                        onChange={setEditingDesc}
+                        rows={6}
+                      />
+                    </div>
+                    <div>
+                      <p className="mb-1 text-xs font-medium text-muted-foreground">Характеристики</p>
+                      <MarkdownEditor
+                        value={editingSpecs}
+                        onChange={setEditingSpecs}
+                        rows={8}
+                      />
+                    </div>
                     <div className="flex gap-2">
                       <button
                         type="button"
                         disabled={savingDesc}
-                        onClick={() => void saveItemDescription(item.id)}
+                        onClick={() => void saveItemContent(item.id)}
                         className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-primary-hover disabled:opacity-50"
                       >
-                        {savingDesc ? "Сохранение…" : "Сохранить описание"}
+                        {savingDesc ? "Сохранение…" : "Сохранить"}
                       </button>
                       <button
                         type="button"
                         onClick={() => {
                           setEditingId(null);
                           setEditingDesc("");
+                          setEditingSpecs("");
                         }}
                         className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
                       >

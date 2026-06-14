@@ -27,6 +27,7 @@ model CatalogItem {
   id          Int                 @id @default(autoincrement())
   name        String
   description String              @default("")
+  specs       String              @default("")
   image       String
   createdAt   DateTime            @default(now())
   categoryId  Int?

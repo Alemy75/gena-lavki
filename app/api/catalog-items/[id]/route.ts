@@ -32,7 +32,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Ожидается объект" }, { status: 400 });
   }
 
-  const data: { categoryId?: number | null; description?: string } = {};
+  const data: { categoryId?: number | null; description?: string; specs?: string } = {};
 
   if ("categoryId" in body) {
     const raw = (body as { categoryId: unknown }).categoryId;
@@ -62,6 +62,17 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Описание слишком длинное" }, { status: 400 });
     }
     data.description = raw.trim();
+  }
+
+  if ("specs" in body) {
+    const raw = (body as { specs: unknown }).specs;
+    if (typeof raw !== "string") {
+      return NextResponse.json({ error: "Некорректные характеристики" }, { status: 400 });
+    }
+    if (raw.length > 20_000) {
+      return NextResponse.json({ error: "Характеристики слишком длинные" }, { status: 400 });
+    }
+    data.specs = raw.trim();
   }
 
   if (Object.keys(data).length === 0) {
