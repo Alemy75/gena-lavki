@@ -33,7 +33,7 @@ export function HeroBanner() {
         src="/hero-bench.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-1/2 w-[165%] max-w-none -translate-x-1/2 translate-y-[16%] select-none md:hidden"
+        className="pointer-events-none absolute bottom-0 left-1/2 w-[120%] max-w-none -translate-x-1/2 translate-y-[20%] select-none md:hidden"
       />
       {/* Десктоп: картинка у правого края, за край уходит ~1/3 ширины */}
       {/* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */}
