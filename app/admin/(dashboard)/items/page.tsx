@@ -256,7 +256,7 @@ export default function AdminItemsPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-10 space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-sm"
+        className="mb-10 space-y-4 rounded-2xl border border-border bg-surface p-6 dark:shadow-sm"
       >
         <div>
           <label htmlFor="item-name" className="mb-1 block text-sm font-medium">
@@ -372,7 +372,7 @@ export default function AdminItemsPage() {
                             type="button"
                             title="Удалить фото"
                             onClick={() => void deleteItemImage(item.id, im.id)}
-                            className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-danger text-[10px] font-bold leading-none text-primary-foreground shadow disabled:cursor-not-allowed disabled:opacity-40"
+                            className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-danger text-[10px] font-bold leading-none text-primary-foreground dark:shadow disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             ×
                           </button>

@@ -8,7 +8,7 @@ export function HeroBanner() {
   return (
     <section
       aria-label="О мастерской"
-      className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm"
+      className="relative overflow-hidden rounded-2xl border border-border bg-surface dark:shadow-sm"
     >
       <div className="relative z-10 max-w-2xl px-6 py-10 sm:px-8 sm:py-12 md:pr-48">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">

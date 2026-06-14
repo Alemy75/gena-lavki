@@ -70,7 +70,7 @@ export default async function CatalogItemPage({ params }: PageProps) {
         </ol>
       </nav>
 
-      <article className="w-full overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+      <article className="w-full overflow-hidden rounded-2xl border border-border bg-surface dark:shadow-sm">
         <div className="flex flex-col gap-6 p-6 sm:gap-8 sm:p-8 md:flex-row md:items-start">
           <div className="min-w-0 w-full flex-1 md:order-1">
             {item.category ? (

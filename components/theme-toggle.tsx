@@ -60,7 +60,7 @@ export function ThemeToggle() {
           aria-pressed={theme === o.value}
           className={
             theme === o.value
-              ? "rounded-md bg-surface px-2.5 py-1 text-xs font-medium text-foreground shadow-sm"
+              ? "rounded-md bg-surface px-2.5 py-1 text-xs font-medium text-foreground dark:shadow-sm"
               : "rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
           }
         >

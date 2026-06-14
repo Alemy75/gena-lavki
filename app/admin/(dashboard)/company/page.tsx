@@ -173,7 +173,7 @@ export default function AdminCompanyPage() {
       ) : (
         <form
           onSubmit={handleSaveSiteSettings}
-          className="mb-8 space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-sm"
+          className="mb-8 space-y-4 rounded-2xl border border-border bg-surface p-6 dark:shadow-sm"
         >
           <div>
             <label htmlFor="site-phone" className="mb-1 block text-sm font-medium">
@@ -227,7 +227,7 @@ export default function AdminCompanyPage() {
       <h3 className="mb-3 text-base font-medium text-foreground">Соцсети</h3>
       <form
         onSubmit={handleAddSocial}
-        className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm"
+        className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 dark:shadow-sm"
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <div>

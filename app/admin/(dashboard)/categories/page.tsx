@@ -83,7 +83,7 @@ export default function AdminCategoriesPage() {
 
       <form
         onSubmit={handleAddCategory}
-        className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:flex-row sm:items-end"
+        className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 dark:shadow-sm sm:flex-row sm:items-end"
       >
         <div className="min-w-0 flex-1">
           <label htmlFor="new-cat-name" className="mb-1 block text-sm font-medium">

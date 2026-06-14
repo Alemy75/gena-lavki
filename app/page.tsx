@@ -56,7 +56,7 @@ export default async function Home({ searchParams }: PageProps) {
               href={`/catalog/${item.id}`}
               className="block h-full rounded-2xl outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
             >
-              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm ring-border transition hover:border-input-border hover:shadow-md">
+              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface dark:shadow-sm ring-border transition hover:border-input-border dark:hover:shadow-md">
                 <div className="relative aspect-square w-full overflow-hidden bg-muted">
                   {/* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */}
                   <img

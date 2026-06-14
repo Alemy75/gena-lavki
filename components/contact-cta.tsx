@@ -7,7 +7,7 @@ export function ContactCta() {
 
   return (
     <section
-      className="mt-10 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4"
+      className="mt-10 rounded-2xl border border-border bg-surface p-4 dark:shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4"
       aria-label="Обратная связь"
     >
       <p className="mb-3 text-sm text-foreground-soft sm:mb-0">

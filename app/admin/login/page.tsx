@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
       </h1>
       <form
         onSubmit={onSubmit}
-        className="space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-sm"
+        className="space-y-4 rounded-2xl border border-border bg-surface p-6 dark:shadow-sm"
       >
         <div>
           <label htmlFor="email" className="mb-1 block text-sm font-medium">
