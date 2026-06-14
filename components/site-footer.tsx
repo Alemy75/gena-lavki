@@ -10,6 +10,7 @@ export async function SiteFooter() {
   ]);
 
   const phone = settings?.phone?.trim() ?? "";
+  const email = settings?.email?.trim() ?? "";
   const address = settings?.address?.trim() ?? "";
   const telHref = phone ? phone.replace(/[^\d+]/g, "") : "";
 
@@ -29,10 +30,21 @@ export async function SiteFooter() {
                 </a>
               </p>
             ) : null}
+            {email ? (
+              <p>
+                <span className="text-zinc-500 dark:text-zinc-500">Почта: </span>
+                <a
+                  href={`mailto:${email}`}
+                  className="font-medium text-zinc-800 underline-offset-2 hover:underline dark:text-zinc-200"
+                >
+                  {email}
+                </a>
+              </p>
+            ) : null}
             {address ? (
               <p className="whitespace-pre-line text-zinc-700 dark:text-zinc-300">{address}</p>
             ) : null}
-            {!phone && !address && socialLinks.length === 0 ? (
+            {!phone && !email && !address && socialLinks.length === 0 ? (
               <p className="text-zinc-400 dark:text-zinc-500">
                 Контакты и соцсети можно добавить в админке.
               </p>

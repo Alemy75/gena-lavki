@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 const NAV = [
   { href: "/admin/categories", label: "Категории" },
   { href: "/admin/items", label: "Позиции" },
-  { href: "/admin/footer", label: "Подвал" },
+  { href: "/admin/company", label: "Данные компании" },
 ] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

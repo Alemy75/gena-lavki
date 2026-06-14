@@ -50,6 +50,7 @@ model CatalogItemImage {
 model SiteSettings {
   id      Int    @id @default(1)
   phone   String @default("")
+  email   String @default("")
   address String @default("")
 
   @@map("site_settings")

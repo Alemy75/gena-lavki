@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { HeaderContactButton } from "@/components/header-contact-button";
 import { SiteFooter } from "@/components/site-footer";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -24,11 +26,16 @@ export const metadata: Metadata = {
 // только на запрос, без пререндера при `next build` (при сборке БД нет).
 export const dynamic = "force-dynamic";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  const phone = settings?.phone?.trim() ?? "";
+  const email = settings?.email?.trim() ?? "";
+  const telHref = phone ? phone.replace(/[^\d+]/g, "") : "";
+
   return (
     <html
       lang="en"
@@ -43,14 +50,27 @@ export default function RootLayout({
             <Link href="/" className="text-lg font-semibold tracking-tight">
               Каталог
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
-              <Link
-                href="/admin/categories"
-                className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
-                Админ
-              </Link>
-            </nav>
+            <div className="flex items-center gap-4 text-sm sm:gap-6">
+              <div className="hidden flex-col items-end leading-tight sm:flex">
+                {phone ? (
+                  <a
+                    href={telHref ? `tel:${telHref}` : undefined}
+                    className="font-medium text-zinc-800 hover:underline dark:text-zinc-100"
+                  >
+                    {phone}
+                  </a>
+                ) : null}
+                {email ? (
+                  <a
+                    href={`mailto:${email}`}
+                    className="text-zinc-500 hover:underline dark:text-zinc-400"
+                  >
+                    {email}
+                  </a>
+                ) : null}
+              </div>
+              <HeaderContactButton />
+            </div>
           </div>
         </header>
         <main className="flex min-h-[100dvh] w-full min-w-0 flex-1 flex-col">{children}</main>

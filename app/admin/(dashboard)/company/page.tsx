@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { SocialLinkRow } from "../_components/social-link-row";
 import type { SocialLink } from "../types";
 
-export default function AdminFooterPage() {
+export default function AdminCompanyPage() {
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [siteLoading, setSiteLoading] = useState(true);
   const [siteSaving, setSiteSaving] = useState(false);
@@ -29,8 +30,13 @@ export default function AdminFooterPage() {
       if (!res.ok) {
         throw new Error("Не удалось загрузить настройки");
       }
-      const data = (await res.json()) as { phone: string; address: string };
+      const data = (await res.json()) as {
+        phone: string;
+        email: string;
+        address: string;
+      };
       setPhone(data.phone ?? "");
+      setEmail(data.email ?? "");
       setAddress(data.address ?? "");
     } catch (e) {
       setMessage({
@@ -77,6 +83,7 @@ export default function AdminFooterPage() {
         credentials: "include",
         body: JSON.stringify({
           phone: phone.trim(),
+          email: email.trim(),
           address: address.trim(),
         }),
       });
@@ -84,7 +91,7 @@ export default function AdminFooterPage() {
       if (!res.ok) {
         throw new Error(data.error ?? res.statusText);
       }
-      setMessage({ type: "ok", text: "Контакты в подвале сохранены" });
+      setMessage({ type: "ok", text: "Данные компании сохранены" });
       await loadSiteSettings();
     } catch (e) {
       setMessage({
@@ -141,9 +148,11 @@ export default function AdminFooterPage() {
 
   return (
     <div>
-      <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">Подвал сайта</h2>
+      <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">
+        Данные компании
+      </h2>
       <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
-        Телефон и адрес показываются внизу каждой страницы. Соцсети — с иконкой (файл до 5 МБ).
+        Телефон, почта и адрес показываются в шапке и подвале каждой страницы. Соцсети — с иконкой (файл до 5 МБ).
       </p>
 
       {message ? (
@@ -176,6 +185,19 @@ export default function AdminFooterPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+7 (900) 000-00-00"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+          <div>
+            <label htmlFor="site-email" className="mb-1 block text-sm font-medium">
+              Почта
+            </label>
+            <input
+              id="site-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="info@example.ru"
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
             />
           </div>

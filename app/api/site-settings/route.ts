@@ -39,12 +39,16 @@ export async function PATCH(request: Request) {
     typeof body === "object" && body !== null && "phone" in body
       ? String((body as { phone: unknown }).phone ?? "")
       : undefined;
+  const email =
+    typeof body === "object" && body !== null && "email" in body
+      ? String((body as { email: unknown }).email ?? "")
+      : undefined;
   const address =
     typeof body === "object" && body !== null && "address" in body
       ? String((body as { address: unknown }).address ?? "")
       : undefined;
 
-  if (phone === undefined && address === undefined) {
+  if (phone === undefined && email === undefined && address === undefined) {
     return NextResponse.json({ error: "Нет полей для обновления" }, { status: 400 });
   }
 
@@ -54,6 +58,7 @@ export async function PATCH(request: Request) {
       where: { id: 1 },
       data: {
         ...(phone !== undefined ? { phone } : {}),
+        ...(email !== undefined ? { email } : {}),
         ...(address !== undefined ? { address } : {}),
       },
     });
