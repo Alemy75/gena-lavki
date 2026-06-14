@@ -76,14 +76,14 @@ export default function AdminCategoriesPage() {
 
   return (
     <div>
-      <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">Категории</h2>
-      <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+      <h2 className="mb-2 text-lg font-medium text-foreground">Категории</h2>
+      <p className="mb-6 text-sm text-muted-foreground">
         Порядок влияет на отображение в сайдбаре на главной странице.
       </p>
 
       <form
         onSubmit={handleAddCategory}
-        className="mb-6 flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end dark:border-zinc-800 dark:bg-zinc-900/80"
+        className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:flex-row sm:items-end"
       >
         <div className="min-w-0 flex-1">
           <label htmlFor="new-cat-name" className="mb-1 block text-sm font-medium">
@@ -95,7 +95,7 @@ export default function AdminCategoriesPage() {
             value={newCatName}
             onChange={(e) => setNewCatName(e.target.value)}
             placeholder="Название"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
           />
         </div>
         <div className="w-28">
@@ -107,13 +107,13 @@ export default function AdminCategoriesPage() {
             type="number"
             value={newCatSort}
             onChange={(e) => setNewCatSort(e.target.value)}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
           />
         </div>
         <button
           type="submit"
           disabled={catSaving}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
         >
           {catSaving ? "…" : "Добавить"}
         </button>
@@ -123,8 +123,8 @@ export default function AdminCategoriesPage() {
         <p
           className={
             message.type === "ok"
-              ? "mb-4 text-sm text-emerald-600 dark:text-emerald-400"
-              : "mb-4 text-sm text-red-600 dark:text-red-400"
+              ? "mb-4 text-sm text-success"
+              : "mb-4 text-sm text-danger"
           }
           role="alert"
         >
@@ -133,11 +133,11 @@ export default function AdminCategoriesPage() {
       ) : null}
 
       {catLoading ? (
-        <p className="text-sm text-zinc-500">Загрузка категорий…</p>
+        <p className="text-sm text-muted-foreground">Загрузка категорий…</p>
       ) : categories.length === 0 ? (
-        <p className="text-sm text-zinc-500">Категорий пока нет.</p>
+        <p className="text-sm text-muted-foreground">Категорий пока нет.</p>
       ) : (
-        <ul className="rounded-xl border border-zinc-200 px-4 dark:border-zinc-800">
+        <ul className="rounded-xl border border-border px-4">
           {categories.map((c) => (
             <CategoryRow
               key={c.id}

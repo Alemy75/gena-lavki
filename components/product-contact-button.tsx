@@ -10,7 +10,7 @@ export function ProductContactButton({ product }: { product: string }) {
     <button
       type="button"
       onClick={() => open({ product })}
-      className="mt-4 w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+      className="mt-4 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover"
     >
       Связаться по этому товару
     </button>

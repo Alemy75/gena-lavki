@@ -11,7 +11,7 @@ import {
 } from "react";
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950";
+  "w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm";
 
 type OpenOptions = { product?: string };
 
@@ -121,10 +121,10 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
 
       <dialog
         ref={dialogRef}
-        className="contact-dialog rounded-2xl border-zinc-200 bg-white text-zinc-900 open:flex open:flex-col dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+        className="contact-dialog rounded-2xl border-border bg-surface text-foreground open:flex open:flex-col"
         aria-labelledby="contact-dialog-title"
       >
-        <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
+        <div className="border-b border-border px-5 py-4">
           <div className="flex items-start justify-between gap-3">
             <h2 id="contact-dialog-title" className="text-lg font-semibold tracking-tight">
               Связаться с нами
@@ -132,29 +132,29 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
             <button
               type="button"
               onClick={close}
-              className="rounded-lg px-2 py-1 text-sm text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+              className="rounded-lg px-2 py-1 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
               aria-label="Закрыть"
             >
               ✕
             </button>
           </div>
           {product ? (
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              Интересует: <span className="font-medium text-zinc-700 dark:text-zinc-300">{product}</span>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Интересует: <span className="font-medium text-foreground-soft">{product}</span>
             </p>
           ) : null}
         </div>
 
         {success ? (
           <div className="px-5 py-6">
-            <p className="text-sm text-zinc-700 dark:text-zinc-300">
+            <p className="text-sm text-foreground-soft">
               {successHint ??
                 "Сообщение отправлено. Мы свяжемся с вами по указанным контактам."}
             </p>
             <button
               type="button"
               onClick={close}
-              className="mt-6 w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+              className="mt-6 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground"
             >
               Закрыть
             </button>
@@ -215,16 +215,16 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
                   type="checkbox"
                   checked={consent}
                   onChange={(e) => setConsent(e.target.checked)}
-                  className="mt-0.5 size-4 shrink-0 rounded border-zinc-300 dark:border-zinc-600"
+                  className="mt-0.5 size-4 shrink-0 rounded border-input-border"
                 />
-                <span className="text-zinc-700 dark:text-zinc-300">
+                <span className="text-foreground-soft">
                   Согласен на обработку персональных данных
                 </span>
               </label>
             </div>
 
             {error ? (
-              <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">
+              <p className="mt-4 text-sm text-danger" role="alert">
                 {error}
               </p>
             ) : null}
@@ -232,7 +232,7 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
             <button
               type="submit"
               disabled={submitting || !consent}
-              className="mt-6 w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="mt-6 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? "Отправка…" : "Отправить"}
             </button>

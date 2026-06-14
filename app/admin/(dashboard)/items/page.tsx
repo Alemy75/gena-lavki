@@ -248,15 +248,15 @@ export default function AdminItemsPage() {
 
   return (
     <div>
-      <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">Позиции</h2>
-      <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+      <h2 className="mb-2 text-lg font-medium text-foreground">Позиции</h2>
+      <p className="mb-6 text-sm text-muted-foreground">
         Добавление: название, описание (необязательно), категория (необязательно) и одно или несколько
         изображений (до 5 МБ каждое, JPEG/PNG/WebP/GIF). Первое фото — обложка в списке.
       </p>
 
       <form
         onSubmit={handleSubmit}
-        className="mb-10 space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80"
+        className="mb-10 space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-sm"
       >
         <div>
           <label htmlFor="item-name" className="mb-1 block text-sm font-medium">
@@ -268,7 +268,7 @@ export default function AdminItemsPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
           />
         </div>
         <div>
@@ -285,7 +285,7 @@ export default function AdminItemsPage() {
             id="item-category"
             value={itemCategoryId}
             onChange={(e) => setItemCategoryId(e.target.value)}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
           >
             <option value="">Без категории</option>
             {categories.map((c) => (
@@ -308,15 +308,15 @@ export default function AdminItemsPage() {
             onChange={(e) =>
               setFiles(e.target.files ? Array.from(e.target.files) : [])
             }
-            className="w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-zinc-200 file:px-3 file:py-1.5 dark:file:bg-zinc-700"
+            className="w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-muted-strong file:px-3 file:py-1.5"
           />
         </div>
         {message ? (
           <p
             className={
               message.type === "ok"
-                ? "text-sm text-emerald-600 dark:text-emerald-400"
-                : "text-sm text-red-600 dark:text-red-400"
+                ? "text-sm text-success"
+                : "text-sm text-danger"
             }
             role="alert"
           >
@@ -326,23 +326,23 @@ export default function AdminItemsPage() {
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover disabled:opacity-50"
         >
           {saving ? "Сохранение…" : "Добавить"}
         </button>
       </form>
 
       <section>
-        <h3 className="mb-3 flex flex-wrap items-center gap-2 text-base font-medium text-zinc-900 dark:text-zinc-50">
+        <h3 className="mb-3 flex flex-wrap items-center gap-2 text-base font-medium text-foreground">
           <span>Текущие позиции</span>
-          <span className="text-zinc-500 dark:text-zinc-400">
+          <span className="text-muted-foreground">
             ({loading ? "…" : items.length})
           </span>
         </h3>
         {loading ? (
-          <p className="text-sm text-zinc-500">Загрузка списка…</p>
+          <p className="text-sm text-muted-foreground">Загрузка списка…</p>
         ) : (
-          <ul className="divide-y divide-zinc-200 rounded-xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+          <ul className="divide-y divide-border rounded-xl border border-border">
             {items.map((item) => {
               const imgs = sortedImages(item);
               return (
@@ -366,13 +366,13 @@ export default function AdminItemsPage() {
                           <img
                             src={im.url}
                             alt=""
-                            className="size-7 rounded object-cover ring-1 ring-zinc-200 dark:ring-zinc-600"
+                            className="size-7 rounded object-cover ring-1 ring-border"
                           />
                           <button
                             type="button"
                             title="Удалить фото"
                             onClick={() => void deleteItemImage(item.id, im.id)}
-                            className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold leading-none text-white shadow disabled:cursor-not-allowed disabled:opacity-40"
+                            className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-danger text-[10px] font-bold leading-none text-primary-foreground shadow disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             ×
                           </button>
@@ -380,7 +380,7 @@ export default function AdminItemsPage() {
                       ))}
                     </ul>
                   ) : null}
-                  <label className="cursor-pointer text-xs text-zinc-500 underline hover:text-zinc-800 dark:hover:text-zinc-200">
+                  <label className="cursor-pointer text-xs text-muted-foreground underline hover:text-foreground">
                     + фото
                     <input
                       type="file"
@@ -397,7 +397,7 @@ export default function AdminItemsPage() {
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">{item.name}</span>
                   {item.description.trim() ? (
-                    <span className="mt-0.5 line-clamp-2 block text-xs font-normal text-zinc-500 dark:text-zinc-400">
+                    <span className="mt-0.5 line-clamp-2 block text-xs font-normal text-muted-foreground">
                       {item.description}
                     </span>
                   ) : null}
@@ -407,7 +407,7 @@ export default function AdminItemsPage() {
                       setEditingId(editingId === item.id ? null : item.id);
                       setEditingDesc(item.description);
                     }}
-                    className="mt-1 text-xs text-zinc-500 underline hover:text-zinc-800 dark:hover:text-zinc-200"
+                    className="mt-1 text-xs text-muted-foreground underline hover:text-foreground"
                   >
                     {editingId === item.id ? "Свернуть" : "Редактировать описание"}
                   </button>
@@ -420,7 +420,7 @@ export default function AdminItemsPage() {
                     id={`cat-${item.id}`}
                     value={item.categoryId === null ? "" : String(item.categoryId)}
                     onChange={(e) => void patchItemCategory(item.id, e.target.value)}
-                    className="w-full rounded-lg border border-zinc-300 bg-white px-2 py-1.5 text-xs dark:border-zinc-600 dark:bg-zinc-950"
+                    className="w-full rounded-lg border border-input-border bg-input px-2 py-1.5 text-xs"
                   >
                     <option value="">Без категории</option>
                     {categories.map((c) => (
@@ -434,11 +434,11 @@ export default function AdminItemsPage() {
                   <button
                     type="button"
                     onClick={() => void deleteItem(item.id, item.name)}
-                    className="rounded-lg px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                    className="rounded-lg px-2 py-1 text-xs font-medium text-danger hover:bg-danger-surface"
                   >
                     Удалить
                   </button>
-                  <span className="text-zinc-400">#{item.id}</span>
+                  <span className="text-muted-foreground">#{item.id}</span>
                 </div>
                 </div>
                 {editingId === item.id ? (
@@ -453,7 +453,7 @@ export default function AdminItemsPage() {
                         type="button"
                         disabled={savingDesc}
                         onClick={() => void saveItemDescription(item.id)}
-                        className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+                        className="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-primary-hover disabled:opacity-50"
                       >
                         {savingDesc ? "Сохранение…" : "Сохранить описание"}
                       </button>
@@ -463,7 +463,7 @@ export default function AdminItemsPage() {
                           setEditingId(null);
                           setEditingDesc("");
                         }}
-                        className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                        className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
                       >
                         Отмена
                       </button>

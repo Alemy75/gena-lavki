@@ -51,15 +51,15 @@ export function MarkdownEditor({
   }
 
   return (
-    <div className="rounded-lg border border-zinc-300 dark:border-zinc-600">
-      <div className="flex flex-wrap items-center gap-1 border-b border-zinc-200 p-1.5 dark:border-zinc-700">
+    <div className="rounded-lg border border-input-border">
+      <div className="flex flex-wrap items-center gap-1 border-b border-border p-1.5">
         {toolbar.map((b) => (
           <button
             key={b.label}
             type="button"
             title={b.title}
             onClick={() => applyWrap(b.wrap)}
-            className="rounded px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="rounded px-2 py-1 text-xs font-medium text-foreground-soft hover:bg-muted"
           >
             {b.label}
           </button>
@@ -67,12 +67,12 @@ export function MarkdownEditor({
         <button
           type="button"
           onClick={() => setShowPreview((v) => !v)}
-          className="ml-auto rounded px-2 py-1 text-xs font-medium text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          className="ml-auto rounded px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
         >
           {showPreview ? "Скрыть превью" : "Показать превью"}
         </button>
       </div>
-      <div className={showPreview ? "grid gap-px bg-zinc-200 dark:bg-zinc-700 md:grid-cols-2" : ""}>
+      <div className={showPreview ? "grid gap-px bg-border md:grid-cols-2" : ""}>
         <textarea
           ref={textareaRef}
           id={id}
@@ -80,14 +80,14 @@ export function MarkdownEditor({
           onChange={(e) => onChange(e.target.value)}
           rows={rows}
           placeholder="Описание в Markdown. ## Заголовок, **жирный**, - списки"
-          className="w-full resize-y bg-white px-3 py-2 font-mono text-sm outline-none dark:bg-zinc-950"
+          className="w-full resize-y bg-input px-3 py-2 font-mono text-sm outline-none"
         />
         {showPreview ? (
-          <div className="min-h-[6rem] overflow-auto bg-white px-3 py-2 dark:bg-zinc-950">
+          <div className="min-h-[6rem] overflow-auto bg-input px-3 py-2">
             {value.trim() ? (
               <Markdown>{value}</Markdown>
             ) : (
-              <p className="text-sm text-zinc-400">Превью появится здесь</p>
+              <p className="text-sm text-muted-foreground">Превью появится здесь</p>
             )}
           </div>
         ) : null}

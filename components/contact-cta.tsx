@@ -7,16 +7,16 @@ export function ContactCta() {
 
   return (
     <section
-      className="mt-10 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80 sm:flex sm:items-center sm:justify-between sm:gap-4"
+      className="mt-10 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4"
       aria-label="Обратная связь"
     >
-      <p className="mb-3 text-sm text-zinc-700 dark:text-zinc-300 sm:mb-0">
+      <p className="mb-3 text-sm text-foreground-soft sm:mb-0">
         Есть вопросы по каталогу или хотите обсудить заказ?
       </p>
       <button
         type="button"
         onClick={() => open()}
-        className="shrink-0 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className="shrink-0 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover"
       >
         Связаться с нами
       </button>

@@ -1,5 +1,76 @@
 @import "tailwindcss";
 
+/* Тёмная тема управляется классом .dark на <html> (скрипт в layout ставит его
+   из localStorage или prefers-color-scheme). Семантические токены ниже
+   переключаются вместе с этим классом. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-muted-strong: var(--muted-strong);
+  --color-foreground: var(--foreground);
+  --color-foreground-soft: var(--foreground-soft);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-border: var(--input-border);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-surface: var(--danger-surface);
+  --color-danger-border: var(--danger-border);
+  --color-success: var(--success);
+}
+
+:root {
+  --background: #fafafa; /* zinc-50 */
+  --surface: #ffffff;
+  --muted: #f4f4f5; /* zinc-100 */
+  --muted-strong: #e4e4e7; /* zinc-200 */
+  --foreground: #18181b; /* zinc-900 */
+  --foreground-soft: #3f3f46; /* zinc-700 */
+  --muted-foreground: #71717a; /* zinc-500 */
+  --border: #e4e4e7; /* zinc-200 */
+  --input: #ffffff;
+  --input-border: #d4d4d8; /* zinc-300 */
+  --ring: #a1a1aa; /* zinc-400 */
+  --primary: #15803d; /* green-700 */
+  --primary-foreground: #ffffff;
+  --primary-hover: #166534; /* green-800 */
+  --danger: #dc2626; /* red-600 */
+  --danger-foreground: #ffffff;
+  --danger-surface: #fef2f2; /* red-50 */
+  --danger-border: #fca5a5; /* red-300 */
+  --success: #059669; /* emerald-600 */
+}
+
+.dark {
+  --background: #09090b; /* zinc-950 */
+  --surface: #18181b; /* zinc-900 */
+  --muted: #27272a; /* zinc-800 */
+  --muted-strong: #3f3f46; /* zinc-700 */
+  --foreground: #fafafa; /* zinc-50 */
+  --foreground-soft: #d4d4d8; /* zinc-300 */
+  --muted-foreground: #a1a1aa; /* zinc-400 */
+  --border: #27272a; /* zinc-800 */
+  --input: #09090b; /* zinc-950 */
+  --input-border: #52525b; /* zinc-600 */
+  --ring: #52525b; /* zinc-600 */
+  --primary: #16a34a; /* green-600 */
+  --primary-foreground: #ffffff;
+  --primary-hover: #15803d; /* green-700 */
+  --danger: #f87171; /* red-400 */
+  --danger-foreground: #ffffff;
+  --danger-surface: #450a0a; /* red-950 */
+  --danger-border: #991b1b; /* red-800 */
+  --success: #34d399; /* emerald-400 */
+}
+
 @layer components {
   /* Закрытый <dialog> должен оставаться display:none; не добавляйте на него безусловный Tailwind `flex`. */
   .contact-dialog:not([open]) {

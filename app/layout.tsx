@@ -40,12 +40,21 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} min-h-dvh antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* До отрисовки выставляем класс темы из localStorage или темы ОС — без мигания. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||((!t||t==='system')&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body
-        className={`${geistSans.className} flex min-h-dvh flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100`}
+        className={`${geistSans.className} flex min-h-dvh flex-col bg-background text-foreground`}
       >
         <Providers>
-        <header className="shrink-0 border-b border-zinc-200 bg-white py-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <header className="shrink-0 border-b border-border bg-surface py-4">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <Link href="/" className="text-lg font-semibold tracking-tight">
               Каталог
@@ -55,7 +64,7 @@ export default async function RootLayout({
                 {phone ? (
                   <a
                     href={telHref ? `tel:${telHref}` : undefined}
-                    className="font-medium text-zinc-800 hover:underline dark:text-zinc-100"
+                    className="font-medium text-foreground hover:underline"
                   >
                     {phone}
                   </a>
@@ -63,7 +72,7 @@ export default async function RootLayout({
                 {email ? (
                   <a
                     href={`mailto:${email}`}
-                    className="text-zinc-500 hover:underline dark:text-zinc-400"
+                    className="text-muted-foreground hover:underline"
                   >
                     {email}
                   </a>

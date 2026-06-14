@@ -12,7 +12,7 @@ export function CatalogItemGallery({ urls, alt }: Props) {
   const [active, setActive] = useState(0);
   if (list.length === 0) {
     return (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl bg-zinc-100 text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl bg-muted text-sm text-muted-foreground">
         Нет изображения
       </div>
     );
@@ -22,7 +22,7 @@ export function CatalogItemGallery({ urls, alt }: Props) {
 
   return (
     <div className="w-full">
-      <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200/80 dark:bg-zinc-800 dark:ring-zinc-700">
+      <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted ring-1 ring-border">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={mainSrc} alt={alt} className="h-full w-full object-cover" />
       </div>
@@ -41,8 +41,8 @@ export function CatalogItemGallery({ urls, alt }: Props) {
                 onClick={() => setActive(i)}
                 className={`h-full w-full overflow-hidden rounded-md ${
                   i === safeIndex
-                    ? "ring-2 ring-zinc-900 ring-offset-2 ring-offset-white dark:ring-zinc-100 dark:ring-offset-zinc-900"
-                    : "opacity-80 ring-1 ring-zinc-200 hover:opacity-100 dark:ring-zinc-600"
+                    ? "ring-2 ring-primary ring-offset-2 ring-offset-surface"
+                    : "opacity-80 ring-1 ring-border hover:opacity-100"
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}

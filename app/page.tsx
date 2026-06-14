@@ -46,7 +46,7 @@ export default async function Home({ searchParams }: PageProps) {
         <CategorySidebar categories={categories} activeCategoryId={activeCategoryId} />
       }
     >
-      <h2 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+      <h2 className="mb-8 text-2xl font-semibold tracking-tight text-foreground">
         Позиции каталога
       </h2>
       <ul className="grid w-full list-none gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -54,10 +54,10 @@ export default async function Home({ searchParams }: PageProps) {
           <li key={item.id}>
             <Link
               href={`/catalog/${item.id}`}
-              className="block h-full rounded-2xl outline-offset-2 focus-visible:outline-2 focus-visible:outline-zinc-400"
+              className="block h-full rounded-2xl outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
             >
-              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-sm ring-zinc-900/5 transition hover:border-zinc-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/80 dark:ring-white/5 dark:hover:border-zinc-700">
-                <div className="relative aspect-square w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm ring-border transition hover:border-input-border hover:shadow-md">
+                <div className="relative aspect-square w-full overflow-hidden bg-muted">
                   {/* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */}
                   <img
                     src={
@@ -70,11 +70,11 @@ export default async function Home({ searchParams }: PageProps) {
                 </div>
                 <div className="flex-1 p-4">
                   {item.category ? (
-                    <p className="mb-1 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                    <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       {item.category.name}
                     </p>
                   ) : null}
-                  <p className="line-clamp-2 text-sm font-medium leading-snug text-zinc-900 dark:text-zinc-100">
+                  <p className="line-clamp-2 text-sm font-medium leading-snug text-foreground">
                     {item.name}
                   </p>
                 </div>
@@ -84,7 +84,7 @@ export default async function Home({ searchParams }: PageProps) {
         ))}
       </ul>
       {items.length === 0 ? (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-muted-foreground">
           В этой категории пока нет позиций.
         </p>
       ) : null}

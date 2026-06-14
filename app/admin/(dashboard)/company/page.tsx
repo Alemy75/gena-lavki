@@ -148,10 +148,10 @@ export default function AdminCompanyPage() {
 
   return (
     <div>
-      <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">
+      <h2 className="mb-2 text-lg font-medium text-foreground">
         Данные компании
       </h2>
-      <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mb-6 text-sm text-muted-foreground">
         Телефон, почта и адрес показываются в шапке и подвале каждой страницы. Соцсети — с иконкой (файл до 5 МБ).
       </p>
 
@@ -159,8 +159,8 @@ export default function AdminCompanyPage() {
         <p
           className={
             message.type === "ok"
-              ? "mb-4 text-sm text-emerald-600 dark:text-emerald-400"
-              : "mb-4 text-sm text-red-600 dark:text-red-400"
+              ? "mb-4 text-sm text-success"
+              : "mb-4 text-sm text-danger"
           }
           role="alert"
         >
@@ -169,11 +169,11 @@ export default function AdminCompanyPage() {
       ) : null}
 
       {siteLoading ? (
-        <p className="mb-8 text-sm text-zinc-500">Загрузка контактов…</p>
+        <p className="mb-8 text-sm text-muted-foreground">Загрузка контактов…</p>
       ) : (
         <form
           onSubmit={handleSaveSiteSettings}
-          className="mb-8 space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80"
+          className="mb-8 space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-sm"
         >
           <div>
             <label htmlFor="site-phone" className="mb-1 block text-sm font-medium">
@@ -185,7 +185,7 @@ export default function AdminCompanyPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+7 (900) 000-00-00"
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -198,7 +198,7 @@ export default function AdminCompanyPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="info@example.ru"
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -211,23 +211,23 @@ export default function AdminCompanyPage() {
               onChange={(e) => setAddress(e.target.value)}
               rows={3}
               placeholder="Полный адрес, как на сайте"
-              className="w-full resize-y rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              className="w-full resize-y rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
             />
           </div>
           <button
             type="submit"
             disabled={siteSaving}
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
           >
             {siteSaving ? "Сохранение…" : "Сохранить контакты"}
           </button>
         </form>
       )}
 
-      <h3 className="mb-3 text-base font-medium text-zinc-900 dark:text-zinc-50">Соцсети</h3>
+      <h3 className="mb-3 text-base font-medium text-foreground">Соцсети</h3>
       <form
         onSubmit={handleAddSocial}
-        className="mb-6 flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80"
+        className="mb-6 flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm"
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
@@ -240,7 +240,7 @@ export default function AdminCompanyPage() {
               value={newSocialLabel}
               onChange={(e) => setNewSocialLabel(e.target.value)}
               placeholder="Например, Telegram"
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -253,7 +253,7 @@ export default function AdminCompanyPage() {
               value={newSocialUrl}
               onChange={(e) => setNewSocialUrl(e.target.value)}
               placeholder="https://"
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
             />
           </div>
         </div>
@@ -267,7 +267,7 @@ export default function AdminCompanyPage() {
               type="number"
               value={newSocialSort}
               onChange={(e) => setNewSocialSort(e.target.value)}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
             />
           </div>
           <div className="min-w-0 flex-1">
@@ -279,13 +279,13 @@ export default function AdminCompanyPage() {
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,.svg"
               onChange={(e) => setNewSocialFile(e.target.files?.[0] ?? null)}
-              className="w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-zinc-200 file:px-3 file:py-1.5 dark:file:bg-zinc-700"
+              className="w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-muted-strong file:px-3 file:py-1.5"
             />
           </div>
           <button
             type="submit"
             disabled={socialSaving}
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
           >
             {socialSaving ? "…" : "Добавить"}
           </button>
@@ -293,11 +293,11 @@ export default function AdminCompanyPage() {
       </form>
 
       {socialLoading ? (
-        <p className="text-sm text-zinc-500">Загрузка соцсетей…</p>
+        <p className="text-sm text-muted-foreground">Загрузка соцсетей…</p>
       ) : socialLinks.length === 0 ? (
-        <p className="text-sm text-zinc-500">Соцсетей пока нет.</p>
+        <p className="text-sm text-muted-foreground">Соцсетей пока нет.</p>
       ) : (
-        <ul className="rounded-xl border border-zinc-200 px-4 dark:border-zinc-800">
+        <ul className="rounded-xl border border-border px-4">
           {socialLinks.map((sl) => (
             <SocialLinkRow
               key={sl.id}

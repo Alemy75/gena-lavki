@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/theme-toggle";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -15,16 +16,16 @@ export async function SiteFooter() {
   const telHref = phone ? phone.replace(/[^\d+]/g, "") : "";
 
   return (
-    <footer className="border-t border-zinc-200 bg-white py-6 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+    <footer className="border-t border-border bg-surface py-6 text-sm text-muted-foreground">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2 text-center sm:text-left">
             {phone ? (
               <p>
-                <span className="text-zinc-500 dark:text-zinc-500">Телефон: </span>
+                <span className="text-muted-foreground">Телефон: </span>
                 <a
                   href={telHref ? `tel:${telHref}` : undefined}
-                  className="font-medium text-zinc-800 underline-offset-2 hover:underline dark:text-zinc-200"
+                  className="font-medium text-foreground underline-offset-2 hover:underline"
                 >
                   {phone}
                 </a>
@@ -32,20 +33,20 @@ export async function SiteFooter() {
             ) : null}
             {email ? (
               <p>
-                <span className="text-zinc-500 dark:text-zinc-500">Почта: </span>
+                <span className="text-muted-foreground">Почта: </span>
                 <a
                   href={`mailto:${email}`}
-                  className="font-medium text-zinc-800 underline-offset-2 hover:underline dark:text-zinc-200"
+                  className="font-medium text-foreground underline-offset-2 hover:underline"
                 >
                   {email}
                 </a>
               </p>
             ) : null}
             {address ? (
-              <p className="whitespace-pre-line text-zinc-700 dark:text-zinc-300">{address}</p>
+              <p className="whitespace-pre-line text-foreground-soft">{address}</p>
             ) : null}
             {!phone && !email && !address && socialLinks.length === 0 ? (
-              <p className="text-zinc-400 dark:text-zinc-500">
+              <p className="text-muted-foreground">
                 Контакты и соцсети можно добавить в админке.
               </p>
             ) : null}
@@ -61,7 +62,7 @@ export async function SiteFooter() {
                   rel="noopener noreferrer"
                   aria-label={link.label}
                   title={link.label}
-                  className="flex size-10 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-800 transition hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                  className="flex size-10 items-center justify-center rounded-lg border border-border bg-muted text-foreground transition hover:bg-muted-strong"
                 >
                   {link.icon ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -81,9 +82,10 @@ export async function SiteFooter() {
           ) : null}
         </div>
 
-        <p className="mt-6 border-t border-zinc-200 pt-4 text-center text-zinc-500 dark:border-zinc-800 dark:text-zinc-500">
-          © {new Date().getFullYear()} Каталог
-        </p>
+        <div className="mt-6 flex flex-col items-center gap-4 border-t border-border pt-4 sm:flex-row sm:justify-between">
+          <p className="text-muted-foreground">© {new Date().getFullYear()} Каталог</p>
+          <ThemeToggle />
+        </div>
       </div>
     </footer>
   );

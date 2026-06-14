@@ -8,20 +8,20 @@ export function HeroBanner() {
   return (
     <section
       aria-label="О мастерской"
-      className="relative overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80"
+      className="relative overflow-hidden rounded-2xl border border-border bg-surface shadow-sm"
     >
       <div className="relative z-10 max-w-2xl px-6 py-10 sm:px-8 sm:py-12 md:pr-48">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
           Лавки и садовая мебель ручной работы
         </h1>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-base">
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
           Делаем уличные лавки, скамьи и мебель для сада и дачи. Подберём
           размер, цвет и форму под ваше место — напишите нам, обсудим заказ.
         </p>
         <button
           type="button"
           onClick={() => open()}
-          className="mt-6 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="mt-6 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover"
         >
           Связаться с нами
         </button>

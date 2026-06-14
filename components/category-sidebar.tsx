@@ -9,18 +9,21 @@ export function CategorySidebar({
   categories: Category[];
   activeCategoryId: number | null;
 }) {
+  const activeClass =
+    "border-primary bg-muted font-medium text-foreground md:border-l-primary";
+  const inactiveClass =
+    "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground";
+
   return (
     <aside className="w-full shrink-0 md:w-52">
-      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Категории
       </h2>
-      <nav className="flex flex-row flex-wrap gap-2 md:flex-col md:flex-nowrap md:gap-0 md:border-l md:border-zinc-200 md:dark:border-zinc-700">
+      <nav className="flex flex-row flex-wrap gap-2 md:flex-col md:flex-nowrap md:gap-0 md:border-l md:border-border">
         <Link
           href="/"
           className={`rounded-lg px-3 py-2 text-sm md:-ml-px md:rounded-l-none md:border-l-2 md:py-1.5 ${
-            activeCategoryId === null
-              ? "border-zinc-900 bg-zinc-100 font-medium text-zinc-900 md:border-l-zinc-900 dark:border-zinc-100 dark:bg-zinc-800 dark:text-zinc-50"
-              : "border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/80 dark:hover:text-zinc-100"
+            activeCategoryId === null ? activeClass : inactiveClass
           }`}
         >
           Все
@@ -32,9 +35,7 @@ export function CategorySidebar({
               key={cat.id}
               href={`/?category=${cat.id}`}
               className={`rounded-lg px-3 py-2 text-sm md:-ml-px md:rounded-l-none md:border-l-2 md:py-1.5 ${
-                active
-                  ? "border-zinc-900 bg-zinc-100 font-medium text-zinc-900 md:border-l-zinc-900 dark:border-zinc-100 dark:bg-zinc-800 dark:text-zinc-50"
-                  : "border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/80 dark:hover:text-zinc-100"
+                active ? activeClass : inactiveClass
               }`}
             >
               {cat.name}

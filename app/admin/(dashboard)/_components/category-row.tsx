@@ -68,23 +68,23 @@ export function CategoryRow({
   }
 
   return (
-    <li className="flex flex-col gap-2 border-b border-zinc-200 py-3 last:border-0 dark:border-zinc-800 sm:flex-row sm:items-end sm:gap-3">
+    <li className="flex flex-col gap-2 border-b border-border py-3 last:border-0 sm:flex-row sm:items-end sm:gap-3">
       <div className="min-w-0 flex-1">
-        <label className="mb-1 block text-xs text-zinc-500">Название</label>
+        <label className="mb-1 block text-xs text-muted-foreground">Название</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
         />
       </div>
       <div className="w-24 shrink-0">
-        <label className="mb-1 block text-xs text-zinc-500">Порядок</label>
+        <label className="mb-1 block text-xs text-muted-foreground">Порядок</label>
         <input
           type="number"
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value)}
-          className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
         />
       </div>
       <div className="flex shrink-0 gap-2">
@@ -92,7 +92,7 @@ export function CategoryRow({
           type="button"
           disabled={busy}
           onClick={() => void save()}
-          className="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600"
+          className="rounded-lg border border-input-border px-3 py-2 text-sm"
         >
           Сохранить
         </button>
@@ -100,7 +100,7 @@ export function CategoryRow({
           type="button"
           disabled={busy}
           onClick={() => void remove()}
-          className="rounded-lg border border-red-300 px-3 py-2 text-sm text-red-700 dark:border-red-800 dark:text-red-400"
+          className="rounded-lg border border-danger-border px-3 py-2 text-sm text-danger"
         >
           Удалить
         </button>
