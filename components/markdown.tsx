@@ -54,6 +54,24 @@ const components: Components = {
       {...props}
     />
   ),
+  table: (props) => (
+    <div className="my-4 overflow-x-auto rounded-lg border border-border">
+      <table className="w-full border-collapse text-sm" {...props} />
+    </div>
+  ),
+  thead: (props) => <thead className="bg-muted" {...props} />,
+  th: (props) => (
+    <th
+      className="border-b border-border px-3 py-2 text-left font-semibold text-foreground"
+      {...props}
+    />
+  ),
+  td: (props) => (
+    <td
+      className="border-b border-border px-3 py-2 align-top first:font-medium first:text-foreground [tr:last-child>&]:border-b-0"
+      {...props}
+    />
+  ),
 };
 
 export function Markdown({ children }: { children: string }) {
