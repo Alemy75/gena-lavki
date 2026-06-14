@@ -2,6 +2,7 @@ import { CatalogItemGallery } from "@/components/catalog-item-gallery";
 import { CatalogPageShell } from "@/components/catalog-page-shell";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { Markdown } from "@/components/markdown";
+import { ProductContactButton } from "@/components/product-contact-button";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -98,6 +99,7 @@ export default async function CatalogItemPage({ params }: PageProps) {
 
           <div className="mx-auto w-full max-w-[min(100%,360px)] shrink-0 md:order-2 md:mx-0">
             <CatalogItemGallery urls={galleryUrls} alt={item.name} />
+            <ProductContactButton product={item.name} />
           </div>
         </div>
       </article>

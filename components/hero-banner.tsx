@@ -20,7 +20,7 @@ export function HeroBanner() {
         </p>
         <button
           type="button"
-          onClick={open}
+          onClick={() => open()}
           className="mt-6 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           Связаться с нами

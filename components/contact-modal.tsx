@@ -13,7 +13,11 @@ import {
 const inputClass =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950";
 
-const ContactModalContext = createContext<{ open: () => void } | null>(null);
+type OpenOptions = { product?: string };
+
+const ContactModalContext = createContext<{ open: (opts?: OpenOptions) => void } | null>(
+  null,
+);
 
 /** Открыть общую модалку обратной связи из любого клиентского компонента. */
 export function useContactModal() {
@@ -35,11 +39,13 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [successHint, setSuccessHint] = useState<string | null>(null);
+  const [product, setProduct] = useState<string | null>(null);
 
-  const open = useCallback(() => {
+  const open = useCallback((opts?: OpenOptions) => {
     setError(null);
     setSuccess(false);
     setSuccessHint(null);
+    setProduct(opts?.product?.trim() || null);
     dialogRef.current?.showModal();
   }, []);
 
@@ -70,7 +76,7 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, consent }),
+        body: JSON.stringify({ name, email, phone, consent, product }),
         signal: controller.signal,
       });
       const data = (await res.json()) as {
@@ -132,6 +138,11 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
               ✕
             </button>
           </div>
+          {product ? (
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Интересует: <span className="font-medium text-zinc-700 dark:text-zinc-300">{product}</span>
+            </p>
+          ) : null}
         </div>
 
         {success ? (

@@ -73,6 +73,7 @@ model ContactMessage {
   email     String
   phone     String
   consent   Boolean
+  product   String?
 
   @@map("contact_message")
 }

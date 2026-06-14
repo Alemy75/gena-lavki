@@ -12,6 +12,7 @@ const MAX_LEN = {
   name: 200,
   email: 254,
   phone: 50,
+  product: 300,
 } as const;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -142,6 +143,8 @@ export async function POST(request: Request) {
   const email = typeof o.email === "string" ? o.email.trim() : "";
   const phone = typeof o.phone === "string" ? o.phone.trim() : "";
   const consent = o.consent === true;
+  const product =
+    typeof o.product === "string" ? o.product.trim().slice(0, MAX_LEN.product) : "";
 
   if (!name || name.length > MAX_LEN.name) {
     return NextResponse.json(
@@ -178,8 +181,13 @@ export async function POST(request: Request) {
     `Обращение: ${name}`,
     `Почта: ${email}`,
     `Телефон: ${phone}`,
+    ...(product ? [`Интересующая позиция: ${product}`] : []),
     `Согласие на обработку ПДн: да`,
   ].join("\n");
+
+  const subject = product
+    ? `Заявка с сайта: ${product}`
+    : "Заявка с сайта: каталог";
 
   const SEND_DEADLINE_MS = 50_000;
   try {
@@ -188,7 +196,7 @@ export async function POST(request: Request) {
         from: cfg.user,
         to: cfg.to,
         ...(omitReplyTo ? {} : { replyTo: email }),
-        subject: "Заявка с сайта: каталог",
+        subject,
         text,
         envelope: {
           from: cfg.user,
@@ -205,7 +213,7 @@ export async function POST(request: Request) {
     if (saveFallback) {
       try {
         await prisma.contactMessage.create({
-          data: { name, email, phone, consent },
+          data: { name, email, phone, consent, product: product || null },
         });
         return NextResponse.json({
           ok: true,
