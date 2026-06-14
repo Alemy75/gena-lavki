@@ -164,6 +164,34 @@ export default function AdminItemsPage() {
     }
   }
 
+  async function deleteItem(itemId: number, itemName: string) {
+    if (!window.confirm(`Удалить «${itemName}»? Действие необратимо.`)) {
+      return;
+    }
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/catalog-items/${itemId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? res.statusText);
+      }
+      if (editingId === itemId) {
+        setEditingId(null);
+        setEditingDesc("");
+      }
+      setMessage({ type: "ok", text: "Позиция удалена" });
+      await loadItems();
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Не удалось удалить",
+      });
+    }
+  }
+
   async function saveItemDescription(itemId: number) {
     setMessage(null);
     setSavingDesc(true);
@@ -402,7 +430,16 @@ export default function AdminItemsPage() {
                     ))}
                   </select>
                 </div>
-                <span className="shrink-0 self-center text-zinc-400">#{item.id}</span>
+                <div className="flex shrink-0 items-center gap-3 self-center">
+                  <button
+                    type="button"
+                    onClick={() => void deleteItem(item.id, item.name)}
+                    className="rounded-lg px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                  >
+                    Удалить
+                  </button>
+                  <span className="text-zinc-400">#{item.id}</span>
+                </div>
                 </div>
                 {editingId === item.id ? (
                   <div className="space-y-2">

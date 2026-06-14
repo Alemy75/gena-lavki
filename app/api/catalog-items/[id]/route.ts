@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { deleteUploadedImageIfLocal } from "@/lib/delete-uploaded-image";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -81,4 +82,35 @@ export async function PATCH(request: Request, context: RouteContext) {
     console.error(error);
     return NextResponse.json({ error: "Не удалось обновить" }, { status: 400 });
   }
+}
+
+export async function DELETE(_request: Request, context: RouteContext) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const itemId = parseId((await context.params).id);
+  if (itemId === null) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+  }
+
+  const item = await prisma.catalogItem.findUnique({
+    where: { id: itemId },
+    include: { images: true },
+  });
+  if (!item) {
+    return NextResponse.json({ error: "Не найдено" }, { status: 404 });
+  }
+
+  // Сначала чистим локальные файлы картинок (Unsplash/внешние URL безопасно игнорируются)
+  for (const img of item.images) {
+    await deleteUploadedImageIfLocal(img.url);
+  }
+  await deleteUploadedImageIfLocal(item.image);
+
+  // Строки catalog_item_image удалятся каскадом (onDelete: Cascade)
+  await prisma.catalogItem.delete({ where: { id: itemId } });
+
+  return NextResponse.json({ ok: true });
 }
