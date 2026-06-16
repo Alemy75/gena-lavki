@@ -47,7 +47,10 @@ export default async function Home({ searchParams }: PageProps) {
         <CategorySidebar categories={categories} activeCategoryId={activeCategoryId} />
       }
     >
-      <h2 className="mb-8 text-2xl font-semibold tracking-tight text-foreground">
+      <h2
+        id="catalog"
+        className="mb-8 scroll-mt-20 text-2xl font-semibold tracking-tight text-foreground"
+      >
         Позиции каталога
       </h2>
       <ul className="grid w-full list-none gap-5 sm:grid-cols-2 lg:grid-cols-3">

@@ -21,7 +21,7 @@ export default async function InfoPage({ params }: PageProps) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <nav className="mb-6 text-sm text-muted-foreground" aria-label="Навигация">
         <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
           <li>
