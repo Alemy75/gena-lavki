@@ -1,7 +1,7 @@
 import { CatalogPageShell } from "@/components/catalog-page-shell";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { ContactCta } from "@/components/contact-cta";
-import { DeliveryCta } from "@/components/delivery-cta";
+import { DeliveryBanner } from "@/components/delivery-banner";
 import { HeroBanner } from "@/components/hero-banner";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -47,10 +47,7 @@ export default async function Home({ searchParams }: PageProps) {
         <CategorySidebar categories={categories} activeCategoryId={activeCategoryId} />
       }
     >
-      <h2
-        id="catalog"
-        className="mb-8 scroll-mt-20 text-2xl font-semibold tracking-tight text-foreground"
-      >
+      <h2 className="mb-8 text-2xl font-semibold tracking-tight text-foreground">
         Позиции каталога
       </h2>
       <ul className="grid w-full list-none gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -93,7 +90,7 @@ export default async function Home({ searchParams }: PageProps) {
         </p>
       ) : null}
       <div className="mt-10">
-        <DeliveryCta />
+        <DeliveryBanner />
       </div>
       <ContactCta />
     </CatalogPageShell>
