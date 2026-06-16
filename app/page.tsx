@@ -46,6 +46,7 @@ export default async function Home({ searchParams }: PageProps) {
       sidebar={
         <CategorySidebar categories={categories} activeCategoryId={activeCategoryId} />
       }
+      bottom={activeCategoryId === null ? <DeliveryBanner /> : undefined}
     >
       <h2 className="mb-8 text-2xl font-semibold tracking-tight text-foreground">
         Позиции каталога
@@ -89,9 +90,6 @@ export default async function Home({ searchParams }: PageProps) {
           В этой категории пока нет позиций.
         </p>
       ) : null}
-      <div className="mt-10">
-        <DeliveryBanner />
-      </div>
       <ContactCta />
     </CatalogPageShell>
   );

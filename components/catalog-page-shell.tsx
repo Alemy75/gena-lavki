@@ -1,14 +1,21 @@
 import type { ReactNode } from "react";
 
-/** Единая ширина с шапкой и подвалом: `max-w-6xl`, контент и сайдбар на всю ширину контейнера */
+/**
+ * Единая ширина с шапкой и подвалом: `max-w-6xl`.
+ * - `hero` — блок сверху на всю ширину контейнера.
+ * - `sidebar` + `children` — раскладка sidebar/content.
+ * - `bottom` — блок снизу на всю ширину контейнера (под раскладкой).
+ */
 export function CatalogPageShell({
   hero,
   sidebar,
   children,
+  bottom,
 }: {
   hero?: ReactNode;
   sidebar: ReactNode;
   children: ReactNode;
+  bottom?: ReactNode;
 }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
@@ -17,6 +24,7 @@ export function CatalogPageShell({
         {sidebar}
         <div className="min-w-0 w-full flex-1">{children}</div>
       </div>
+      {bottom ? <div className="mt-10">{bottom}</div> : null}
     </div>
   );
 }
