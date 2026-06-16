@@ -1,6 +1,7 @@
 import { CatalogPageShell } from "@/components/catalog-page-shell";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { ContactCta } from "@/components/contact-cta";
+import { DeliveryCta } from "@/components/delivery-cta";
 import { HeroBanner } from "@/components/hero-banner";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -88,6 +89,9 @@ export default async function Home({ searchParams }: PageProps) {
           В этой категории пока нет позиций.
         </p>
       ) : null}
+      <div className="mt-10">
+        <DeliveryCta />
+      </div>
       <ContactCta />
     </CatalogPageShell>
   );

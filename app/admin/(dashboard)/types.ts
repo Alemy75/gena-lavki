@@ -30,3 +30,11 @@ export type SocialLink = {
   icon: string;
   sortOrder: number;
 };
+
+export type PageEntry = {
+  id: number;
+  slug: string;
+  title: string;
+  content?: string;
+  updatedAt: string;
+};

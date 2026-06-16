@@ -68,6 +68,16 @@ model SocialLink {
 }
 
 /// Заявки с формы, если SMTP недоступен и включён CONTACT_SAVE_IF_MAIL_FAILS
+model Page {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  title     String
+  content   String   @default("")
+  updatedAt DateTime @updatedAt
+
+  @@map("page")
+}
+
 model ContactMessage {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())

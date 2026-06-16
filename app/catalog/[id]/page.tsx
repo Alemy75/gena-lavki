@@ -1,6 +1,7 @@
 import { CatalogItemGallery } from "@/components/catalog-item-gallery";
 import { CatalogPageShell } from "@/components/catalog-page-shell";
 import { CategorySidebar } from "@/components/category-sidebar";
+import { DeliveryCta } from "@/components/delivery-cta";
 import { Markdown } from "@/components/markdown";
 import { ProductContactButton } from "@/components/product-contact-button";
 import { prisma } from "@/lib/prisma";
@@ -112,6 +113,14 @@ export default async function CatalogItemPage({ params }: PageProps) {
           </div>
         ) : null}
       </article>
+
+      <div className="mt-6">
+        <DeliveryCta
+          title="Хотите подробности по доставке?"
+          description="Сроки, регионы, способы — на отдельной странице. Вам сюда."
+          cta="К условиям доставки →"
+        />
+      </div>
     </CatalogPageShell>
   );
 }
