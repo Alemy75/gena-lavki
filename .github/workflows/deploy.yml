@@ -38,13 +38,15 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Copy compose file to server
+      - name: Copy compose and Caddy config to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: root
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: docker-compose.prod.yml
+          source: |
+            docker-compose.prod.yml
+            Caddyfile
           target: /opt/gena-lavki
 
       - name: Pull image and restart
