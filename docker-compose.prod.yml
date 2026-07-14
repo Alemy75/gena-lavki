@@ -1,6 +1,8 @@
 services:
   db:
-    image: postgres:16-alpine
+    # Через зеркало Docker Hub от Timeweb — иначе анонимный пулл с Docker Hub
+    # с IP VPS упирается в 429 Too Many Requests. Образ идентичен postgres:16-alpine.
+    image: dockerhub.timeweb.cloud/library/postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: catalog
@@ -32,7 +34,8 @@ services:
         condition: service_healthy
 
   caddy:
-    image: caddy:2-alpine
+    # Зеркало Docker Hub от Timeweb (см. комментарий у db). = caddy:2-alpine
+    image: dockerhub.timeweb.cloud/library/caddy:2-alpine
     restart: unless-stopped
     ports:
       - "80:80"
