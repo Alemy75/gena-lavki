@@ -35,6 +35,10 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
+  const siteName =
+    typeof body === "object" && body !== null && "siteName" in body
+      ? String((body as { siteName: unknown }).siteName ?? "")
+      : undefined;
   const phone =
     typeof body === "object" && body !== null && "phone" in body
       ? String((body as { phone: unknown }).phone ?? "")
@@ -48,7 +52,12 @@ export async function PATCH(request: Request) {
       ? String((body as { address: unknown }).address ?? "")
       : undefined;
 
-  if (phone === undefined && email === undefined && address === undefined) {
+  if (
+    siteName === undefined &&
+    phone === undefined &&
+    email === undefined &&
+    address === undefined
+  ) {
     return NextResponse.json({ error: "Нет полей для обновления" }, { status: 400 });
   }
 
@@ -57,6 +66,7 @@ export async function PATCH(request: Request) {
     const settings = await prisma.siteSettings.update({
       where: { id: 1 },
       data: {
+        ...(siteName !== undefined ? { siteName } : {}),
         ...(phone !== undefined ? { phone } : {}),
         ...(email !== undefined ? { email } : {}),
         ...(address !== undefined ? { address } : {}),

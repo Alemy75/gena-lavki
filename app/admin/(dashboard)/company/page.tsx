@@ -5,6 +5,7 @@ import { SocialLinkRow } from "../_components/social-link-row";
 import type { SocialLink } from "../types";
 
 export default function AdminCompanyPage() {
+  const [siteName, setSiteName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
@@ -31,10 +32,12 @@ export default function AdminCompanyPage() {
         throw new Error("Не удалось загрузить настройки");
       }
       const data = (await res.json()) as {
+        siteName: string;
         phone: string;
         email: string;
         address: string;
       };
+      setSiteName(data.siteName ?? "");
       setPhone(data.phone ?? "");
       setEmail(data.email ?? "");
       setAddress(data.address ?? "");
@@ -82,6 +85,7 @@ export default function AdminCompanyPage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
+          siteName: siteName.trim(),
           phone: phone.trim(),
           email: email.trim(),
           address: address.trim(),
@@ -152,7 +156,9 @@ export default function AdminCompanyPage() {
         Данные компании
       </h2>
       <p className="mb-6 text-sm text-muted-foreground">
-        Телефон, почта и адрес показываются в шапке и подвале каждой страницы. Соцсети — с иконкой (файл до 5 МБ).
+        Название сайта попадает в шапку, подвал и заголовки страниц в поиске.
+        Телефон, почта и адрес показываются в шапке и подвале каждой страницы.
+        Соцсети — с иконкой (файл до 5 МБ).
       </p>
 
       {message ? (
@@ -175,6 +181,19 @@ export default function AdminCompanyPage() {
           onSubmit={handleSaveSiteSettings}
           className="mb-8 space-y-4 rounded-2xl border border-border bg-surface p-6 dark:shadow-sm"
         >
+          <div>
+            <label htmlFor="site-name" className="mb-1 block text-sm font-medium">
+              Название сайта
+            </label>
+            <input
+              id="site-name"
+              type="text"
+              value={siteName}
+              onChange={(e) => setSiteName(e.target.value)}
+              placeholder="Название мастерской — шапка, title и «© …» в подвале"
+              className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
+            />
+          </div>
           <div>
             <label htmlFor="site-phone" className="mb-1 block text-sm font-medium">
               Телефон

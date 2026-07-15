@@ -2,11 +2,27 @@ import { CatalogItemGallery } from "@/components/catalog-item-gallery";
 import { CatalogPageShell } from "@/components/catalog-page-shell";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { DeliveryCta } from "@/components/delivery-cta";
+import { JsonLd } from "@/components/json-ld";
 import { Markdown } from "@/components/markdown";
 import { ProductContactButton } from "@/components/product-contact-button";
 import { prisma } from "@/lib/prisma";
+import {
+  categoryPath,
+  isThinItem,
+  metaDescriptionFromMarkdown,
+  parseIdSlugSegment,
+  productPath,
+} from "@/lib/seo";
+import {
+  absoluteUrl,
+  DEFAULT_DESCRIPTION,
+  getCategories,
+  getSiteName,
+} from "@/lib/site";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { cache } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -14,34 +30,111 @@ type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export default async function CatalogItemPage({ params }: PageProps) {
-  const { id: rawId } = await params;
-  const id = Number.parseInt(rawId, 10);
-  if (!Number.isFinite(id) || id < 1) {
+// Дедупликация между generateMetadata и страницей в рамках одного запроса.
+const getItem = cache((id: number) =>
+  prisma.catalogItem.findUnique({
+    where: { id },
+    include: {
+      category: true,
+      images: { orderBy: { sortOrder: "asc" } },
+    },
+  }),
+);
+
+/**
+ * Возвращает товар для сегмента `12-skamya-sd` и канонизирует URL:
+ * мусорные сегменты (`1abc`, `01`) — 404, старый вид `/catalog/12` или
+ * устаревший слаг — 308 на канонический.
+ */
+async function resolveItem(segment: string) {
+  const parsed = parseIdSlugSegment(segment);
+  if (!parsed) {
     notFound();
   }
-
-  const [item, categories] = await Promise.all([
-    prisma.catalogItem.findUnique({
-      where: { id },
-      include: {
-        category: true,
-        images: { orderBy: { sortOrder: "asc" } },
-      },
-    }),
-    prisma.category.findMany({
-      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-    }),
-  ]);
-
+  const item = await getItem(parsed.id);
   if (!item) {
     notFound();
   }
+  const canonical = productPath(item);
+  if (canonical !== `/catalog/${segment}`) {
+    permanentRedirect(canonical);
+  }
+  return item;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id: segment } = await params;
+  const item = await resolveItem(segment);
+
+  const description =
+    metaDescriptionFromMarkdown(item.description) || DEFAULT_DESCRIPTION;
+  const imageUrls = (
+    item.images.length > 0 ? item.images.map((im) => im.url) : [item.image]
+  ).map(absoluteUrl);
+  const isThin = isThinItem(item);
+
+  return {
+    title: item.name,
+    description,
+    alternates: { canonical: productPath(item) },
+    openGraph: {
+      title: item.name,
+      description,
+      url: productPath(item),
+      images: imageUrls,
+    },
+    ...(isThin ? { robots: { index: false } } : {}),
+  };
+}
+
+export default async function CatalogItemPage({ params }: PageProps) {
+  const { id: segment } = await params;
+  const [item, categories, siteName] = await Promise.all([
+    resolveItem(segment),
+    getCategories(),
+    getSiteName(),
+  ]);
 
   const galleryUrls =
     item.images.length > 0 ? item.images.map((im) => im.url) : [item.image];
 
   const activeCategoryId = item.categoryId ?? null;
+
+  const plainDescription = metaDescriptionFromMarkdown(item.description);
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: item.name,
+    url: absoluteUrl(productPath(item)),
+    image: galleryUrls.map(absoluteUrl),
+    ...(plainDescription ? { description: plainDescription } : {}),
+    ...(item.category ? { category: item.category.name } : {}),
+    brand: { "@type": "Brand", name: siteName },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Каталог", item: absoluteUrl("/") },
+      ...(item.category
+        ? [
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: item.category.name,
+              item: absoluteUrl(categoryPath(item.category)),
+            },
+          ]
+        : []),
+      {
+        "@type": "ListItem",
+        position: item.category ? 3 : 2,
+        name: item.name,
+        item: absoluteUrl(productPath(item)),
+      },
+    ],
+  };
 
   return (
     <CatalogPageShell
@@ -49,6 +142,8 @@ export default async function CatalogItemPage({ params }: PageProps) {
         <CategorySidebar categories={categories} activeCategoryId={activeCategoryId} />
       }
     >
+      <JsonLd data={productJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <nav
         className="mb-6 text-sm text-muted-foreground"
         aria-label="Навигация по каталогу"
@@ -62,6 +157,21 @@ export default async function CatalogItemPage({ params }: PageProps) {
               Каталог
             </Link>
           </li>
+          {item.category ? (
+            <>
+              <li className="select-none text-muted-foreground" aria-hidden>
+                /
+              </li>
+              <li>
+                <Link
+                  href={categoryPath(item.category)}
+                  className="font-medium text-muted-foreground transition hover:text-foreground hover:underline"
+                >
+                  {item.category.name}
+                </Link>
+              </li>
+            </>
+          ) : null}
           <li className="select-none text-muted-foreground" aria-hidden>
             /
           </li>
@@ -77,7 +187,7 @@ export default async function CatalogItemPage({ params }: PageProps) {
             {item.category ? (
               <p className="mb-2">
                 <Link
-                  href={`/?category=${item.category.id}`}
+                  href={categoryPath(item.category)}
                   className="inline-block rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground-soft transition hover:bg-muted-strong"
                 >
                   {item.category.name}

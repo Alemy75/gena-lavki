@@ -24,7 +24,13 @@ export function CatalogItemGallery({ urls, alt }: Props) {
     <div className="w-full">
       <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted ring-1 ring-border">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={mainSrc} alt={alt} className="h-full w-full object-cover" />
+        <img
+          src={mainSrc}
+          alt={alt}
+          fetchPriority="high"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
       </div>
       {list.length > 1 ? (
         <ul
@@ -38,6 +44,7 @@ export function CatalogItemGallery({ urls, alt }: Props) {
                 type="button"
                 role="tab"
                 aria-selected={i === safeIndex}
+                aria-label={`Фото ${i + 1} из ${list.length}`}
                 onClick={() => setActive(i)}
                 className={`h-full w-full overflow-hidden rounded-md ${
                   i === safeIndex
