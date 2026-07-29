@@ -1,45 +1,113 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JsonLd } from "@/components/json-ld";
 import { HeaderContactButton } from "@/components/header-contact-button";
 import { SiteFooter } from "@/components/site-footer";
-import { prisma } from "@/lib/prisma";
+import { YandexMetrika } from "@/components/yandex-metrika";
+import {
+  DEFAULT_DESCRIPTION,
+  getSiteName,
+  getSiteSettings,
+  getSocialLinks,
+  siteUrl,
+} from "@/lib/site";
+import type { Metadata, Viewport } from "next";
+import { Geist } from "next/font/google";
 import Link from "next/link";
 import { Providers } from "./providers";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  // Сайт кириллический: без сабсета cyrillic весь текст рендерился бы
+  // системным фолбэком, а Geist грузился бы впустую.
+  subsets: ["latin", "cyrillic"],
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Каталог",
-  description: "Каталог товаров",
-};
 
 // Все страницы читают БД (настройки сайта, соцссылки в футере) — рендерим
 // только на запрос, без пререндера при `next build` (при сборке БД нет).
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const siteName = await getSiteName();
+  const title = `${siteName} — лавки и садовая мебель ручной работы`;
+
+  const verification: NonNullable<Metadata["verification"]> = {};
+  if (process.env.YANDEX_VERIFICATION) {
+    verification.yandex = process.env.YANDEX_VERIFICATION;
+  }
+  if (process.env.GOOGLE_SITE_VERIFICATION) {
+    verification.google = process.env.GOOGLE_SITE_VERIFICATION;
+  }
+
+  return {
+    metadataBase: new URL(siteUrl()),
+    title: {
+      default: title,
+      template: `%s — ${siteName}`,
+    },
+    description: DEFAULT_DESCRIPTION,
+    openGraph: {
+      siteName,
+      locale: "ru_RU",
+      type: "website",
+      images: ["/hero-bench.webp"],
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    verification,
+  };
+}
+
+export const viewport: Viewport = {
+  // Цвета фона из globals.css (:root и .dark)
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
+};
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  const [settings, socialLinks, siteName] = await Promise.all([
+    getSiteSettings(),
+    getSocialLinks(),
+    getSiteName(),
+  ]);
   const phone = settings?.phone?.trim() ?? "";
   const email = settings?.email?.trim() ?? "";
+  const address = settings?.address?.trim() ?? "";
   const telHref = phone ? phone.replace(/[^\d+]/g, "") : "";
+
+  const organizationJsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteName,
+    url: `${siteUrl()}/`,
+    ...(phone ? { telephone: phone } : {}),
+    ...(email ? { email } : {}),
+    ...(address ? { address } : {}),
+    ...(socialLinks.length > 0
+      ? { sameAs: socialLinks.map((link) => link.url) }
+      : {}),
+  };
 
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} min-h-dvh antialiased`}
+      lang="ru"
+      className={`${geistSans.variable} min-h-dvh antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -53,11 +121,13 @@ export default async function RootLayout({
       <body
         className={`${geistSans.className} flex min-h-dvh flex-col bg-background text-foreground`}
       >
+        <JsonLd data={organizationJsonLd} />
+        <YandexMetrika />
         <Providers>
         <header className="shrink-0 border-b border-border bg-surface py-4">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <Link href="/" className="text-lg font-semibold tracking-tight">
-              Каталог
+              {siteName}
             </Link>
             <div className="flex items-center gap-4 text-sm sm:gap-6">
               <div className="hidden flex-col items-end leading-tight sm:flex">

@@ -1,3 +1,4 @@
+import { categoryPath } from "@/lib/seo";
 import Link from "next/link";
 
 type Category = { id: number; name: string };
@@ -16,9 +17,11 @@ export function CategorySidebar({
 
   return (
     <aside className="w-full shrink-0 md:w-52">
-      <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      {/* Не заголовок: в DOM сайдбар идёт раньше h1 страницы, и h2 здесь
+          ломал порядок заголовков (outline начинался с «Категории»). */}
+      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Категории
-      </h2>
+      </p>
       <nav className="flex flex-row flex-wrap gap-2 md:flex-col md:flex-nowrap md:gap-0 md:border-l md:border-border">
         <Link
           href="/"
@@ -33,7 +36,7 @@ export function CategorySidebar({
           return (
             <Link
               key={cat.id}
-              href={`/?category=${cat.id}`}
+              href={categoryPath(cat)}
               className={`rounded-lg px-3 py-2 text-sm md:-ml-px md:rounded-l-none md:border-l-2 md:py-1.5 ${
                 active ? activeClass : inactiveClass
               }`}

@@ -1,7 +1,10 @@
 import { Markdown } from "@/components/markdown";
 import { prisma } from "@/lib/prisma";
+import { metaDescriptionFromMarkdown } from "@/lib/seo";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -9,13 +12,33 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export default async function InfoPage({ params }: PageProps) {
-  const { slug } = await params;
+// Дедупликация между generateMetadata и страницей в рамках одного запроса.
+const getPage = cache(async (slug: string) => {
   if (!/^[a-z0-9-]+$/.test(slug)) {
+    return null;
+  }
+  return prisma.page.findUnique({ where: { slug } });
+});
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const page = await getPage(slug);
+  if (!page) {
     notFound();
   }
 
-  const page = await prisma.page.findUnique({ where: { slug } });
+  return {
+    title: page.title,
+    description: metaDescriptionFromMarkdown(page.content) || undefined,
+    alternates: { canonical: `/info/${slug}` },
+    // Незаполненная страница — thin content, в индекс не отдаём.
+    ...(page.content.trim() ? {} : { robots: { index: false } }),
+  };
+}
+
+export default async function InfoPage({ params }: PageProps) {
+  const { slug } = await params;
+  const page = await getPage(slug);
   if (!page) {
     notFound();
   }

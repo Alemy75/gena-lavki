@@ -1,6 +1,8 @@
 services:
   db:
-    image: postgres:16-alpine
+    # Через зеркало Docker Hub от Timeweb — иначе анонимный пулл с Docker Hub
+    # с IP VPS упирается в 429 Too Many Requests. Образ идентичен postgres:16-alpine.
+    image: dockerhub.timeweb.cloud/library/postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: catalog
@@ -18,8 +20,10 @@ services:
   app:
     image: ghcr.io/alemy75/gena-lavki:latest
     restart: unless-stopped
-    ports:
-      - "80:3000"
+    # Порт наружу больше не публикуем — приложение доступно только внутри
+    # compose-сети, снаружи его закрывает Caddy (TLS-терминация + прокси).
+    expose:
+      - "3000"
     env_file: .env
     environment:
       DATABASE_URL: postgresql://catalog:${POSTGRES_PASSWORD}@db:5432/catalog?schema=public
@@ -29,6 +33,23 @@ services:
       db:
         condition: service_healthy
 
+  caddy:
+    # Зеркало Docker Hub от Timeweb (см. комментарий у db). = caddy:2-alpine
+    image: dockerhub.timeweb.cloud/library/caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3 (QUIC); при закрытом UDP просто откатится на TCP
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data      # сертификаты Let's Encrypt — обязательно на томе
+      - caddy_config:/config
+    depends_on:
+      - app
+
 volumes:
   postgres_data:
   catalog_uploads:
+  caddy_data:
+  caddy_config:
