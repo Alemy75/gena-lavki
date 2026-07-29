@@ -1,12 +1,21 @@
+import { CatalogGrid } from "@/components/catalog-grid";
 import { CatalogPageShell } from "@/components/catalog-page-shell";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { ContactCta } from "@/components/contact-cta";
 import { DeliveryBanner } from "@/components/delivery-banner";
 import { HeroBanner } from "@/components/hero-banner";
+import { JsonLd } from "@/components/json-ld";
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
+import { categoryPath, productPath } from "@/lib/seo";
+import { absoluteUrl, getCategories } from "@/lib/site";
+import type { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 type PageProps = {
   searchParams: Promise<{ category?: string }>;
@@ -15,21 +24,25 @@ type PageProps = {
 export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const categoryParam = params.category?.trim() ?? "";
-  let activeCategoryId: number | null = null;
+
+  // Прежние фильтры /?category=N переехали на канонические лендинги
+  // /category/N-slug; любые невалидные значения параметра — на главную,
+  // чтобы не плодить индексируемые дубли под разными URL.
   if (categoryParam !== "") {
-    const n = Number.parseInt(categoryParam, 10);
-    if (Number.isFinite(n) && n > 0) {
-      activeCategoryId = n;
+    if (/^[1-9]\d*$/.test(categoryParam)) {
+      const category = await prisma.category.findUnique({
+        where: { id: Number.parseInt(categoryParam, 10) },
+      });
+      if (category) {
+        permanentRedirect(categoryPath(category));
+      }
     }
+    permanentRedirect("/");
   }
 
   const [categories, items] = await Promise.all([
-    prisma.category.findMany({
-      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-    }),
+    getCategories(),
     prisma.catalogItem.findMany({
-      where:
-        activeCategoryId !== null ? { categoryId: activeCategoryId } : undefined,
       orderBy: { id: "asc" },
       include: {
         category: true,
@@ -38,56 +51,31 @@ export default async function Home({ searchParams }: PageProps) {
     }),
   ]);
 
-  type Item = (typeof items)[number];
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      url: absoluteUrl(productPath(item)),
+    })),
+  };
 
   return (
     <CatalogPageShell
-      hero={activeCategoryId === null ? <HeroBanner /> : undefined}
-      sidebar={
-        <CategorySidebar categories={categories} activeCategoryId={activeCategoryId} />
-      }
-      bottom={activeCategoryId === null ? <DeliveryBanner /> : undefined}
+      hero={<HeroBanner />}
+      sidebar={<CategorySidebar categories={categories} activeCategoryId={null} />}
+      bottom={<DeliveryBanner />}
     >
+      <JsonLd data={itemListJsonLd} />
       <h2 className="mb-8 text-2xl font-semibold tracking-tight text-foreground">
         Позиции каталога
       </h2>
-      <ul className="grid w-full list-none gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((item: Item) => (
-          <li key={item.id}>
-            <Link
-              href={`/catalog/${item.id}`}
-              className="block h-full rounded-2xl outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
-            >
-              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface dark:shadow-sm ring-border transition hover:border-input-border dark:hover:shadow-md">
-                <div className="relative aspect-square w-full overflow-hidden bg-muted">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */}
-                  <img
-                    src={
-                      item.images.length > 0 ? item.images[0]!.url : item.image
-                    }
-                    alt={item.name}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-                  />
-                </div>
-                <div className="flex-1 p-4">
-                  {item.category ? (
-                    <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      {item.category.name}
-                    </p>
-                  ) : null}
-                  <p className="line-clamp-2 text-sm font-medium leading-snug text-foreground">
-                    {item.name}
-                  </p>
-                </div>
-              </article>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <CatalogGrid items={items} />
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          В этой категории пока нет позиций.
+          В каталоге пока нет позиций.
         </p>
       ) : null}
       <ContactCta />

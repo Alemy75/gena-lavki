@@ -18,6 +18,7 @@ model Category {
   id        Int           @id @default(autoincrement())
   name      String        @unique
   sortOrder Int           @default(0)
+  updatedAt DateTime      @default(now()) @updatedAt
   items     CatalogItem[]
 
   @@map("category")
@@ -30,6 +31,7 @@ model CatalogItem {
   specs       String              @default("")
   image       String
   createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @default(now()) @updatedAt
   categoryId  Int?
   category    Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   images      CatalogItemImage[]
@@ -49,10 +51,11 @@ model CatalogItemImage {
 }
 
 model SiteSettings {
-  id      Int    @id @default(1)
-  phone   String @default("")
-  email   String @default("")
-  address String @default("")
+  id       Int    @id @default(1)
+  siteName String @default("")
+  phone    String @default("")
+  email    String @default("")
+  address  String @default("")
 
   @@map("site_settings")
 }

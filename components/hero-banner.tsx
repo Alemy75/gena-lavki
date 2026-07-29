@@ -30,17 +30,23 @@ export function HeroBanner() {
           края и низ уходят за границы (обрезаются overflow-hidden карточки) */}
       {/* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */}
       <img
-        src="/hero-bench.png"
+        src="/hero-bench.webp"
         alt=""
         aria-hidden="true"
+        width={640}
+        height={640}
+        fetchPriority="high"
         className="pointer-events-none absolute bottom-0 left-1/2 w-[120%] max-w-none -translate-x-1/2 translate-y-[20%] select-none md:hidden"
       />
       {/* Десктоп: картинка у правого края, за край уходит ~1/3 ширины */}
       {/* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */}
       <img
-        src="/hero-bench.png"
+        src="/hero-bench.webp"
         alt=""
         aria-hidden="true"
+        width={640}
+        height={640}
+        fetchPriority="high"
         className="pointer-events-none absolute right-0 top-1/2 hidden h-[180%] w-auto max-w-none -translate-y-1/2 translate-x-1/3 select-none md:block"
       />
     </section>

@@ -39,11 +39,28 @@ const components: Components = {
     <strong className="font-semibold text-foreground" {...props} />
   ),
   em: (props) => <em className="italic" {...props} />,
-  a: (props) => (
-    <a
-      className="font-medium text-foreground underline underline-offset-2 hover:text-muted-foreground"
-      target="_blank"
-      rel="noopener noreferrer"
+  a: ({ href, ...props }) => {
+    // Внутренние ссылки (относительные или на свой домен) — обычная навигация;
+    // новую вкладку и noopener оставляем только внешним.
+    const isExternal = typeof href === "string" && /^[a-z][a-z0-9+.-]*:|^\/\//i.test(href);
+    return (
+      <a
+        className="font-medium text-foreground underline underline-offset-2 hover:text-muted-foreground"
+        href={href}
+        {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        {...props}
+      />
+    );
+  },
+  img: (props) => (
+    // Размеры из markdown не приходят — ограничиваем ширину и грузим лениво,
+    // чтобы картинки из описаний не давали сдвигов и не тормозили LCP.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      loading="lazy"
+      decoding="async"
+      className="my-3 h-auto max-w-full rounded-lg"
+      alt=""
       {...props}
     />
   ),

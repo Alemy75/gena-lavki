@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "category" ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "catalog_item" ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "site_settings" ADD COLUMN     "siteName" TEXT NOT NULL DEFAULT '';
