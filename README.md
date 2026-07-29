@@ -166,6 +166,46 @@ docker compose exec app node prisma/seed.js
 
 ---
 
+## Резервное копирование и восстановление
+
+Ручные бэкапы БД (`catalog`) и загрузок (`public/uploads`). Копии живут на VPS
+(быстрый откат) и скачиваются на Mac (off-site). Секреты (`.env`) бэкапятся отдельно.
+Дизайн: `docs/superpowers/specs/2026-07-29-backups-design.md`.
+
+### Регулярно (с Mac)
+
+```bash
+make pull          # сделать бэкап на сервере и скачать в ~/gena-lavki-backups/
+```
+
+Запускай перед каждым деплоем/правкой контента и раз в неделю.
+
+```bash
+make pull-secrets  # разово: скачать .env в ~/gena-lavki-backups/secrets/ (при смене секретов)
+```
+
+### Восстановление
+
+**На том же VPS** (кривая миграция / удалили данные):
+
+```bash
+ssh root@201.51.4.231
+bash /opt/gena-lavki/scripts/restore.sh /opt/gena-lavki/backups/gena-lavki_<ts>.tgz
+```
+
+**Из копии на Mac** (в т.ч. на новом сервере после пересборки):
+
+```bash
+make restore FILE=~/gena-lavki-backups/gena-lavki_<ts>.tgz
+```
+
+### Защита от удаления сервера за неоплату
+
+Бэкапы — страховка. В панели Timeweb включи автоплатёж, держи буфер на балансе и
+уведомления о низком балансе — это не даёт наступить 7-дневному удалению VPS.
+
+---
+
 ## Полезные ссылки
 
 - [Prisma Migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate)
