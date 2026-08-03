@@ -31,6 +31,14 @@ export function run(
     });
     if (opts.stdin) {
       opts.stdin.on("error", reject);
+      // EPIPE — процесс закрыл stdin раньше конца потока (например, psql вышел
+      // на первой ошибке SQL): игнорируем, информативная причина придёт из
+      // close с ненулевым кодом и текстом stderr.
+      child.stdin!.on("error", (e: NodeJS.ErrnoException) => {
+        if (e.code !== "EPIPE") {
+          reject(e);
+        }
+      });
       opts.stdin.pipe(child.stdin!);
     }
   });
