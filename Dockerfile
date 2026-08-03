@@ -50,6 +50,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# prisma/seed.js запускается напрямую через `node`, а не через Next.js —
+# трассировка standalone-сборки не включает его зависимости (require("bcryptjs")
+# падал с MODULE_NOT_FOUND). У bcryptjs нет своих зависимостей — просто копируем.
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/bcryptjs ./node_modules/bcryptjs
 RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public
 
 USER nextjs
