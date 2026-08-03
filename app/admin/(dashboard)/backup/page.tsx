@@ -19,9 +19,9 @@ export default function AdminBackupPage() {
       </a>
 
       <p className="mt-4 text-xs text-muted-foreground">
-        Сбор архива занимает несколько секунд. Восстановить его можно скриптом{" "}
-        <code>scripts/restore.sh</code> (см. README) — формат совпадает с бэкапом
-        по SSH.
+        Сбор архива занимает несколько секунд. Восстановить бэкап можно формой ниже
+        или скриптом <code>scripts/restore.sh</code> по SSH (см. README) — формат
+        одинаковый.
       </p>
 
       <RestoreForm />

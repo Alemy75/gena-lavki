@@ -54,7 +54,8 @@ export async function POST(request: Request) {
     await mkdir(unpacked);
     try {
       await run("tar", ["-xzf", bundle, "-C", unpacked]);
-    } catch {
+    } catch (e) {
+      console.error("restore: bundle extraction failed", e);
       return fail("bundle", "Файл не распаковался — это не .tgz-бандл бэкапа", 400);
     }
     const dbDump = path.join(unpacked, "db.sql.gz");
@@ -77,7 +78,8 @@ export async function POST(request: Request) {
     try {
       await pipeline(createReadStream(dbDump), createGunzip(), createWriteStream(dbSql));
       await run("tar", ["-tzf", uploadsTgz]);
-    } catch {
+    } catch (e) {
+      console.error("restore: bundle integrity check failed", e);
       return fail("bundle", "Архив бэкапа повреждён: db.sql.gz или uploads.tgz не читается", 400);
     }
 
