@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
-import { spawn } from "node:child_process";
+import { pgConn } from "@/lib/pg-conn";
+import { run } from "@/lib/run";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -21,45 +22,6 @@ export const dynamic = "force-dynamic";
 
 const gzip = promisify(gzipCb);
 
-/** Запускает команду, копит stdout в Buffer; реджектит при ненулевом коде выхода. */
-function run(cmd: string, args: string[], env?: NodeJS.ProcessEnv): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, { env: env ?? process.env });
-    const out: Buffer[] = [];
-    const err: Buffer[] = [];
-    child.stdout!.on("data", (c: Buffer) => out.push(c));
-    child.stderr!.on("data", (c: Buffer) => err.push(c));
-    child.on("error", reject);
-    child.on("close", (code) => {
-      if (code === 0) {
-        resolve(Buffer.concat(out));
-      } else {
-        reject(
-          new Error(
-            `${cmd} завершился с кодом ${code}: ${Buffer.concat(err).toString("utf8").slice(0, 500)}`,
-          ),
-        );
-      }
-    });
-  });
-}
-
-/** Разбирает DATABASE_URL в параметры подключения + PGPASSWORD (минуя ?schema=…). */
-function pgConn(): { host: string; port: string; user: string; db: string; env: NodeJS.ProcessEnv } {
-  const raw = process.env.DATABASE_URL;
-  if (!raw) {
-    throw new Error("DATABASE_URL не задан");
-  }
-  const u = new URL(raw);
-  return {
-    host: u.hostname,
-    port: u.port || "5432",
-    user: decodeURIComponent(u.username),
-    db: u.pathname.replace(/^\//, "") || "catalog",
-    env: { ...process.env, PGPASSWORD: decodeURIComponent(u.password) },
-  };
-}
-
 function stamp(d: Date): string {
   const p = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
@@ -80,7 +42,7 @@ export async function GET() {
     const sql = await run(
       "pg_dump",
       ["-h", host, "-p", port, "-U", user, "-d", db, "--clean", "--if-exists"],
-      env,
+      { env },
     );
     const dbGz = await gzip(sql);
 
