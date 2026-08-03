@@ -26,7 +26,20 @@ FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN apt-get update -y && apt-get install -y openssl ca-certificates \
+# openssl/ca-certificates — для prisma; postgresql-client-16 (pg_dump) — для бэкапа
+# из админки. В bookworm по умолчанию только client-15 (не дампит сервер 16),
+# поэтому ставим 16 из официального PGDG-репозитория.
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends openssl ca-certificates curl gnupg \
+  && install -d /usr/share/postgresql-common/pgdg \
+  && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+       -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+  && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
+       > /etc/apt/sources.list.d/pgdg.list \
+  && apt-get update -y \
+  && apt-get install -y --no-install-recommends postgresql-client-16 \
+  && apt-get purge -y curl gnupg \
+  && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/*
 RUN npm install -g prisma@6.19.3
 
