@@ -69,16 +69,35 @@ export async function POST(request: Request) {
       }
     }
 
+    // целостность внутренних архивов — тоже до любых изменений данных:
+    // дамп распаковываем сразу (битый gzip = 400, БД не тронута; psql потом
+    // читает обычный файл, который не может упасть посреди транзакции),
+    // uploads.tgz проверяем списком содержимого
+    const dbSql = path.join(work, "db.sql");
+    try {
+      await pipeline(createReadStream(dbDump), createGunzip(), createWriteStream(dbSql));
+      await run("tar", ["-tzf", uploadsTgz]);
+    } catch {
+      return fail("bundle", "Архив бэкапа повреждён: db.sql.gz или uploads.tgz не читается", 400);
+    }
+
     // 3) БД: дамп с --clean --if-exists, одной транзакцией
-    const { host, port, user, db, env } = pgConn();
+    let conn: ReturnType<typeof pgConn>;
+    try {
+      conn = pgConn();
+    } catch (e) {
+      console.error("restore: pgConn failed", e);
+      return fail("db", "Сервер не сконфигурирован (DATABASE_URL) — файл бэкапа ни при чём");
+    }
+    const { host, port, user, db, env } = conn;
     try {
       await run(
         "psql",
         [
           "-h", host, "-p", port, "-U", user, "-d", db,
-          "-v", "ON_ERROR_STOP=1", "--single-transaction", "--quiet",
+          "-w", "-v", "ON_ERROR_STOP=1", "--single-transaction", "--quiet",
         ],
-        { env, stdin: createReadStream(dbDump).pipe(createGunzip()) },
+        { env, stdin: createReadStream(dbSql) },
       );
     } catch (e) {
       console.error("restore: psql failed", e);
@@ -109,7 +128,7 @@ export async function POST(request: Request) {
       console.error("restore: uploads failed", e);
       return fail(
         "uploads",
-        "БД восстановлена, но файлы uploads восстановить не удалось. Повторите восстановление.",
+        "БД восстановлена, но файлы uploads восстановить не удалось — каталог мог остаться пустым. Повторите восстановление.",
       );
     }
 
