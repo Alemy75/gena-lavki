@@ -1,3 +1,5 @@
+import { RestoreForm } from "./restore-form";
+
 export default function AdminBackupPage() {
   return (
     <div className="max-w-2xl">
@@ -21,6 +23,8 @@ export default function AdminBackupPage() {
         <code>scripts/restore.sh</code> (см. README) — формат совпадает с бэкапом
         по SSH.
       </p>
+
+      <RestoreForm />
     </div>
   );
 }
