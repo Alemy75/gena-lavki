@@ -187,7 +187,7 @@ export default function AdminPagesPage() {
             <button
               type="button"
               onClick={() => setEditing(null)}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
+              className="rounded-lg border border-input-border px-4 py-2 text-sm font-medium text-foreground-soft hover:bg-muted"
             >
               Отмена
             </button>

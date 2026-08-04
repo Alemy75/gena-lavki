@@ -51,7 +51,7 @@ export function MarkdownEditor({
   }
 
   return (
-    <div className="rounded-lg border border-input-border">
+    <div className="overflow-hidden rounded-lg border border-input-border has-[textarea:focus]:outline-2 has-[textarea:focus]:outline-offset-2 has-[textarea:focus]:outline-ring">
       <div className="flex flex-wrap items-center gap-1 border-b border-border p-1.5">
         {toolbar.map((b) => (
           <button
@@ -67,7 +67,7 @@ export function MarkdownEditor({
         <button
           type="button"
           onClick={() => setShowPreview((v) => !v)}
-          className="ml-auto rounded px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
+          className="ml-auto rounded border border-input-border px-2 py-1 text-xs font-medium text-foreground-soft hover:bg-muted"
         >
           {showPreview ? "Скрыть превью" : "Показать превью"}
         </button>
