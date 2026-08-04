@@ -297,7 +297,7 @@ export default function AdminItemsPage() {
             id="item-category"
             value={itemCategoryId}
             onChange={(e) => setItemCategoryId(e.target.value)}
-            className="w-full rounded-lg border border-input-border bg-input px-3 py-2 text-sm"
+            className="select-caret w-full rounded-lg border border-input-border bg-input py-2 pl-3 text-sm"
           >
             <option value="">Без категории</option>
             {categories.map((c) => (
@@ -392,7 +392,7 @@ export default function AdminItemsPage() {
                       ))}
                     </ul>
                   ) : null}
-                  <label className="cursor-pointer text-xs text-muted-foreground underline hover:text-foreground">
+                  <label className="inline-flex w-fit cursor-pointer items-center rounded-lg border border-input-border px-2 py-1 text-xs font-medium text-foreground-soft hover:bg-muted has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring">
                     + фото
                     <input
                       type="file"
@@ -420,7 +420,7 @@ export default function AdminItemsPage() {
                       setEditingDesc(item.description);
                       setEditingSpecs(item.specs ?? "");
                     }}
-                    className="mt-1 text-xs text-muted-foreground underline hover:text-foreground"
+                    className="mt-1.5 rounded-lg border border-input-border px-2 py-1 text-xs font-medium text-foreground-soft hover:bg-muted"
                   >
                     {editingId === item.id ? "Свернуть" : "Редактировать описание и характеристики"}
                   </button>
@@ -433,7 +433,7 @@ export default function AdminItemsPage() {
                     id={`cat-${item.id}`}
                     value={item.categoryId === null ? "" : String(item.categoryId)}
                     onChange={(e) => void patchItemCategory(item.id, e.target.value)}
-                    className="w-full rounded-lg border border-input-border bg-input px-2 py-1.5 text-xs"
+                    className="select-caret w-full rounded-lg border border-input-border bg-input py-1.5 pl-2 text-xs"
                   >
                     <option value="">Без категории</option>
                     {categories.map((c) => (
@@ -447,7 +447,7 @@ export default function AdminItemsPage() {
                   <button
                     type="button"
                     onClick={() => void deleteItem(item.id, item.name)}
-                    className="rounded-lg px-2 py-1 text-xs font-medium text-danger hover:bg-danger-surface"
+                    className="rounded-lg border border-danger-border px-2 py-1 text-xs font-medium text-danger hover:bg-danger-surface"
                   >
                     Удалить
                   </button>
@@ -488,7 +488,7 @@ export default function AdminItemsPage() {
                           setEditingDesc("");
                           setEditingSpecs("");
                         }}
-                        className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
+                        className="rounded-lg border border-input-border px-3 py-1.5 text-xs font-medium text-foreground-soft hover:bg-muted"
                       >
                         Отмена
                       </button>
