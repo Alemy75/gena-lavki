@@ -89,6 +89,7 @@ export default async function RootLayout({
   const phone = settings?.phone?.trim() ?? "";
   const email = settings?.email?.trim() ?? "";
   const address = settings?.address?.trim() ?? "";
+  const logo = settings?.logo?.trim() ?? "";
   const telHref = phone ? phone.replace(/[^\d+]/g, "") : "";
 
   const organizationJsonLd: Record<string, unknown> = {
@@ -126,7 +127,21 @@ export default async function RootLayout({
         <Providers>
         <header className="shrink-0 border-b border-border bg-surface py-4">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-            <Link href="/" className="text-lg font-semibold tracking-tight">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-lg font-semibold tracking-tight"
+            >
+              {logo ? (
+                /* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */
+                <img
+                  src={logo}
+                  alt=""
+                  aria-hidden="true"
+                  width={32}
+                  height={32}
+                  className="size-8 shrink-0 rounded object-cover"
+                />
+              ) : null}
               {siteName}
             </Link>
             <div className="flex items-center gap-4 text-sm sm:gap-6">
