@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { HOME_DEFAULTS } from "@/lib/home-content";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -11,11 +12,14 @@ const FIELDS = [
 ] as const;
 
 async function ensureHomeContent() {
-  let row = await prisma.homeContent.findUnique({ where: { id: 1 } });
-  if (!row) {
-    row = await prisma.homeContent.create({ data: { id: 1 } });
-  }
-  return row;
+  return prisma.homeContent.upsert({
+    where: { id: 1 },
+    // Создаём сразу с дефолтами: пустая строка означала бы «пунктов доставки нет»
+    // (см. правило в lib/home-content.ts) — открытие админки молча вычистило бы
+    // список с главной, и вернуть его из формы было бы нечем.
+    create: { id: 1, ...HOME_DEFAULTS },
+    update: {},
+  });
 }
 
 export async function GET() {

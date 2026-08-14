@@ -64,8 +64,8 @@ export function DeliveryBanner({
 
           {features.length > 0 ? (
             <ul className="mt-4 space-y-1.5 text-sm text-foreground-soft">
-              {features.map((f) => (
-                <li key={f} className="flex items-start gap-2">
+              {features.map((f, i) => (
+                <li key={`${i}-${f}`} className="flex items-start gap-2">
                   <CheckIcon />
                   <span>{f}</span>
                 </li>

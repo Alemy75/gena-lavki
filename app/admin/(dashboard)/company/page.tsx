@@ -320,7 +320,12 @@ export default function AdminCompanyPage() {
           ]
         ).map(({ field, label, value }) => (
           <div key={field} className="min-w-0">
-            <span className="mb-2 block text-sm font-medium">{label}</span>
+            <label
+              htmlFor={`site-image-${field}`}
+              className="mb-2 block text-sm font-medium"
+            >
+              {label}
+            </label>
             <div className="flex items-center gap-3">
               {value ? (
                 /* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */
@@ -335,6 +340,7 @@ export default function AdminCompanyPage() {
                 <span className="text-sm text-muted-foreground">не задан</span>
               )}
               <input
+                id={`site-image-${field}`}
                 type="file"
                 accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon,.ico,.svg"
                 disabled={imageSaving}
