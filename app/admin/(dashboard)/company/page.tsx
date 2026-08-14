@@ -11,6 +11,9 @@ export default function AdminCompanyPage() {
   const [address, setAddress] = useState("");
   const [siteLoading, setSiteLoading] = useState(true);
   const [siteSaving, setSiteSaving] = useState(false);
+  const [logo, setLogo] = useState("");
+  const [favicon, setFavicon] = useState("");
+  const [imageSaving, setImageSaving] = useState(false);
 
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [socialLoading, setSocialLoading] = useState(true);
@@ -36,11 +39,15 @@ export default function AdminCompanyPage() {
         phone: string;
         email: string;
         address: string;
+        logo: string;
+        favicon: string;
       };
       setSiteName(data.siteName ?? "");
       setPhone(data.phone ?? "");
       setEmail(data.email ?? "");
       setAddress(data.address ?? "");
+      setLogo(data.logo ?? "");
+      setFavicon(data.favicon ?? "");
     } catch (e) {
       setMessage({
         type: "err",
@@ -104,6 +111,61 @@ export default function AdminCompanyPage() {
       });
     } finally {
       setSiteSaving(false);
+    }
+  }
+
+  async function handleImageUpload(field: "logo" | "favicon", file: File) {
+    setMessage(null);
+    setImageSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append("field", field);
+      fd.append("file", file);
+      const res = await fetch("/api/site-settings/images", {
+        method: "POST",
+        body: fd,
+        credentials: "include",
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? res.statusText);
+      }
+      setMessage({
+        type: "ok",
+        text: field === "logo" ? "Логотип обновлён" : "Иконка сайта обновлена",
+      });
+      await loadSiteSettings();
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Ошибка загрузки",
+      });
+    } finally {
+      setImageSaving(false);
+    }
+  }
+
+  async function handleImageDelete(field: "logo" | "favicon") {
+    setMessage(null);
+    setImageSaving(true);
+    try {
+      const res = await fetch(`/api/site-settings/images?field=${field}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? res.statusText);
+      }
+      setMessage({ type: "ok", text: "Картинка убрана" });
+      await loadSiteSettings();
+    } catch (e) {
+      setMessage({
+        type: "err",
+        text: e instanceof Error ? e.message : "Ошибка удаления",
+      });
+    } finally {
+      setImageSaving(false);
     }
   }
 
@@ -242,6 +304,63 @@ export default function AdminCompanyPage() {
           </button>
         </form>
       )}
+
+      <h3 className="mb-3 text-base font-medium text-foreground">
+        Логотип и иконка сайта
+      </h3>
+      <p className="mb-3 text-sm text-muted-foreground">
+        Логотип — квадратная картинка слева от названия в шапке. Иконка сайта
+        (favicon) видна на вкладке браузера. PNG или SVG, квадрат, от 64×64, до 5 МБ.
+      </p>
+      <div className="mb-8 grid gap-4 rounded-2xl border border-border bg-surface p-4 sm:grid-cols-2 dark:shadow-sm">
+        {(
+          [
+            { field: "logo" as const, label: "Логотип", value: logo },
+            { field: "favicon" as const, label: "Иконка сайта", value: favicon },
+          ]
+        ).map(({ field, label, value }) => (
+          <div key={field} className="min-w-0">
+            <span className="mb-2 block text-sm font-medium">{label}</span>
+            <div className="flex items-center gap-3">
+              {value ? (
+                /* eslint-disable-next-line @next/next/no-img-element -- native img per project preference */
+                <img
+                  src={value}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="size-10 shrink-0 rounded border border-border object-cover"
+                />
+              ) : (
+                <span className="text-sm text-muted-foreground">не задан</span>
+              )}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon,.ico,.svg"
+                disabled={imageSaving}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    void handleImageUpload(field, file);
+                  }
+                  e.target.value = "";
+                }}
+                className="min-w-0 flex-1 text-sm file:mr-3 file:rounded file:border-0 file:bg-muted-strong file:px-3 file:py-1.5"
+              />
+              {value ? (
+                <button
+                  type="button"
+                  disabled={imageSaving}
+                  onClick={() => void handleImageDelete(field)}
+                  className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-sm disabled:opacity-50"
+                >
+                  Убрать
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ))}
+      </div>
 
       <h3 className="mb-3 text-base font-medium text-foreground">Соцсети</h3>
       <form
