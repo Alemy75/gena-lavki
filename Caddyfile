@@ -1,8 +1,8 @@
-boost-by-ai.ru {
+lavki76.ru {
 	reverse_proxy app:3000
 }
 
 # www → на голый домен (канонический URL один, совпадает с AUTH_URL)
-www.boost-by-ai.ru {
-	redir https://boost-by-ai.ru{uri} permanent
+www.lavki76.ru {
+	redir https://lavki76.ru{uri} permanent
 }

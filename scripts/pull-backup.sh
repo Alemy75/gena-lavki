@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Mac: делает свежий бэкап на сервере и скачивает его сюда.
 set -euo pipefail
-REMOTE="${REMOTE:-root@201.51.4.231}"
+REMOTE="${REMOTE:-root@200.165.234.167}"
 REMOTE_DIR="${REMOTE_DIR:-/opt/gena-lavki}"
 LOCAL_DIR="${LOCAL_DIR:-$HOME/gena-lavki-backups}"
 KEEP="${KEEP:-30}"

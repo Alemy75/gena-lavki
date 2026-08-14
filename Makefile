@@ -1,5 +1,5 @@
 # Бэкапы каталога. Переопределить сервер: make pull REMOTE=root@1.2.3.4
-REMOTE ?= root@201.51.4.231
+REMOTE ?= root@200.165.234.167
 export REMOTE
 
 .PHONY: pull pull-secrets restore backup help

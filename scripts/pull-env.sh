@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Mac: разово скачать серверный .env в приватную папку. Запускать при смене секретов.
 set -euo pipefail
-REMOTE="${REMOTE:-root@201.51.4.231}"
+REMOTE="${REMOTE:-root@200.165.234.167}"
 REMOTE_DIR="${REMOTE_DIR:-/opt/gena-lavki}"
 SECRETS_DIR="${SECRETS_DIR:-$HOME/gena-lavki-backups/secrets}"
 
