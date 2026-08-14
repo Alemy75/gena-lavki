@@ -77,6 +77,28 @@ async function main() {
     });
   }
 
+  // Тексты баннеров главной — только если строки ещё нет (не затираем правки из админки).
+  const homeRow = await prisma.homeContent.findUnique({ where: { id: 1 } });
+  if (!homeRow) {
+    await prisma.homeContent.create({
+      data: {
+        id: 1,
+        heroTitle: "Лавки и садовая мебель ручной работы",
+        heroText:
+          "Делаем уличные лавки, скамьи и мебель для сада и дачи. Подберём размер, цвет и форму под ваше место — напишите нам, обсудим заказ.",
+        deliveryTitle: "Привезём заказ к вам",
+        deliveryText:
+          "Отправляем по всей России через транспортные компании. Точную стоимость и сроки рассчитываем индивидуально под каждый заказ.",
+        deliveryFeatures: [
+          "По всей России — СДЭК, Деловые Линии, ПЭК",
+          "Самовывоз со склада в Москве — бесплатно",
+          "Сроки и стоимость рассчитаем под ваш заказ",
+        ].join("\n"),
+      },
+    });
+    console.log("Seeded home content");
+  }
+
   // WhatsApp-ссылка — только если соцссылок ещё нет.
   const socialCount = await prisma.socialLink.count();
   if (socialCount === 0) {
