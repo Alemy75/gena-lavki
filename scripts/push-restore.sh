@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Mac: залить локальный бандл на сервер и восстановить из него (DR).
 set -euo pipefail
-REMOTE="${REMOTE:-root@201.51.4.231}"
+REMOTE="${REMOTE:-root@200.165.234.167}"
 REMOTE_DIR="${REMOTE_DIR:-/opt/gena-lavki}"
 bundle="${1:?укажи путь к локальному бандлу .tgz}"
 [ -f "$bundle" ] || { echo "нет файла: $bundle" >&2; exit 1; }

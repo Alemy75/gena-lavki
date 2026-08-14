@@ -127,6 +127,72 @@ docker compose exec app node prisma/seed.js
 
 ---
 
+## Развёртывание: новый VPS с нуля
+
+Прод живёт на Timeweb VPS `200.165.234.167`, домен `lavki76.ru`, каталог стека
+`/opt/gena-lavki`. Ниже — полный путь с чистой машины (Debian/Ubuntu, доступ root по SSH).
+
+**1. Залить файлы стека с Mac**
+
+```bash
+scp docker-compose.prod.yml Caddyfile scripts/provision-server.sh scripts/backup.sh scripts/restore.sh root@200.165.234.167:/root/
+```
+
+**2. Подготовить сервер** (на сервере; `DEPLOY_PUBKEY` — публичная часть ключа из секрета `DEPLOY_SSH_KEY`)
+
+```bash
+DOMAIN=lavki76.ru DEPLOY_PUBKEY="ssh-ed25519 AAAA... deploy" bash /root/provision-server.sh
+```
+
+Скрипт ставит Docker, создаёт `/opt/gena-lavki`, кладёт ключ деплоя и генерирует
+`.env` со свежими `POSTGRES_PASSWORD`, `AUTH_SECRET`, `AUTH_URL`, `SITE_URL` и паролем
+первого админа. Повторный запуск существующий `.env` не трогает.
+
+**3. Разложить файлы и дописать почту**
+
+```bash
+mkdir -p /opt/gena-lavki/scripts
+mv /root/docker-compose.prod.yml /root/Caddyfile /opt/gena-lavki/
+mv /root/backup.sh /root/restore.sh /opt/gena-lavki/scripts/
+nano /opt/gena-lavki/.env   # SMTP_USER, SMTP_PASSWORD, CONTACT_MAIL_TO
+```
+
+**4. Поднять стек.** Проще всего — сразу шаг 6 (секрет `DEPLOY_HOST`) и пуш в `main`:
+workflow сам делает `docker login ghcr.io`, `pull` и `up -d`, PAT не нужен. Вручную —
+если образ в GHCR приватный, сначала login с токеном (права `read:packages`):
+
+```bash
+docker login ghcr.io -u alemy75
+cd /opt/gena-lavki && docker compose -f docker-compose.prod.yml up -d
+```
+
+`prisma migrate deploy` выполняется при старте контейнера — схема создаётся сама.
+Первый админ и демо-позиции:
+
+```bash
+docker compose -f docker-compose.prod.yml exec app node prisma/seed.js
+```
+
+**5. DNS.** В панели Timeweb: A-записи `lavki76.ru` и `www.lavki76.ru` → `200.165.234.167`.
+Пока записи не разошлись, Caddy не получит сертификат Let's Encrypt и будет
+повторять попытки — это нормально, отдельных действий не требует.
+
+**6. Автодеплой.** В GitHub → Settings → Secrets: `DEPLOY_HOST` = `200.165.234.167`.
+`DEPLOY_SSH_KEY` остаётся прежним, если его публичная часть попала в `authorized_keys`
+на шаге 2. Дальше пуш в `main` собирает образ и перезапускает стек.
+
+**7. Проверить**
+
+```bash
+curl -sI https://lavki76.ru | head -3          # 200 и валидный TLS
+curl -s https://lavki76.ru/robots.txt          # Sitemap с доменом, не localhost
+docker compose -f docker-compose.prod.yml logs --tail=30 caddy
+```
+
+Вход в `/admin/login` учёткой из `.env`, загрузка изображения, форма «Связаться с нами».
+
+---
+
 ## Механизм миграций (Prisma)
 
 1. **Источник правды** — файл `prisma/schema.prisma`. Любое изменение схемы должно отражаться в миграциях и быть закоммичено.
@@ -195,7 +261,7 @@ make pull-secrets  # разово: скачать .env в ~/gena-lavki-backups/s
 **На том же VPS** (кривая миграция / удалили данные):
 
 ```bash
-ssh root@201.51.4.231
+ssh root@200.165.234.167
 bash /opt/gena-lavki/scripts/restore.sh /opt/gena-lavki/backups/gena-lavki_<ts>.tgz
 ```
 
