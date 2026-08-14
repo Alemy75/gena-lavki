@@ -57,6 +57,10 @@ model SiteSettings {
   email    String @default("")
   address  String @default("")
 
+  /// Публичные пути /uploads/... либо пустая строка
+  logo     String @default("")
+  favicon  String @default("")
+
   @@map("site_settings")
 }
 
@@ -91,4 +95,16 @@ model ContactMessage {
   product   String?
 
   @@map("contact_message")
+}
+
+/// Тексты баннеров главной. Singleton: всегда одна строка с id = 1.
+model HomeContent {
+  id               Int    @id @default(1)
+  heroTitle        String @default("")
+  heroText         String @default("")
+  deliveryTitle    String @default("")
+  deliveryText     String @default("")
+  deliveryFeatures String @default("")
+
+  @@map("home_content")
 }
