@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
+  { href: "/admin/home", label: "Главная" },
   { href: "/admin/categories", label: "Категории" },
   { href: "/admin/items", label: "Позиции" },
   { href: "/admin/pages", label: "Страницы" },
