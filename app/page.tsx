@@ -5,6 +5,7 @@ import { ContactCta } from "@/components/contact-cta";
 import { DeliveryBanner } from "@/components/delivery-banner";
 import { HeroBanner } from "@/components/hero-banner";
 import { JsonLd } from "@/components/json-ld";
+import { getHomeContent } from "@/lib/home-content";
 import { prisma } from "@/lib/prisma";
 import { categoryPath, productPath } from "@/lib/seo";
 import { absoluteUrl, getCategories } from "@/lib/site";
@@ -50,6 +51,7 @@ export default async function Home({ searchParams }: PageProps) {
       },
     }),
   ]);
+  const home = await getHomeContent();
 
   const itemListJsonLd = {
     "@context": "https://schema.org",
@@ -64,9 +66,15 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <CatalogPageShell
-      hero={<HeroBanner />}
+      hero={<HeroBanner title={home.heroTitle} text={home.heroText} />}
       sidebar={<CategorySidebar categories={categories} activeCategoryId={null} />}
-      bottom={<DeliveryBanner />}
+      bottom={
+        <DeliveryBanner
+          title={home.deliveryTitle}
+          text={home.deliveryText}
+          features={home.deliveryFeatures}
+        />
+      }
     >
       <JsonLd data={itemListJsonLd} />
       <h2 className="mb-8 text-2xl font-semibold tracking-tight text-foreground">

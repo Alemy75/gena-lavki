@@ -1,11 +1,5 @@
 import Link from "next/link";
 
-const FEATURES = [
-  "По всей России — СДЭК, Деловые Линии, ПЭК",
-  "Самовывоз со склада в Москве — бесплатно",
-  "Сроки и стоимость рассчитаем под ваш заказ",
-];
-
 function CheckIcon() {
   return (
     <svg
@@ -40,7 +34,15 @@ function TruckIcon() {
 }
 
 /** Большой баннер «Доставка» на главной — заголовок, преимущества, CTA на /info/delivery. */
-export function DeliveryBanner() {
+export function DeliveryBanner({
+  title,
+  text,
+  features,
+}: {
+  title: string;
+  text: string;
+  features: string[];
+}) {
   return (
     <section
       aria-label="Доставка"
@@ -54,21 +56,22 @@ export function DeliveryBanner() {
       <div className="relative grid gap-6 sm:gap-8 md:grid-cols-[1fr_auto] md:items-center">
         <div className="min-w-0">
           <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-            Привезём заказ к вам
+            {title}
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Отправляем по всей России через транспортные компании. Точную
-            стоимость и сроки рассчитываем индивидуально под каждый заказ.
+            {text}
           </p>
 
-          <ul className="mt-4 space-y-1.5 text-sm text-foreground-soft">
-            {FEATURES.map((f) => (
-              <li key={f} className="flex items-start gap-2">
-                <CheckIcon />
-                <span>{f}</span>
-              </li>
-            ))}
-          </ul>
+          {features.length > 0 ? (
+            <ul className="mt-4 space-y-1.5 text-sm text-foreground-soft">
+              {features.map((f) => (
+                <li key={f} className="flex items-start gap-2">
+                  <CheckIcon />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
 
           <Link
             href="/info/delivery"

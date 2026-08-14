@@ -2,7 +2,7 @@
 
 import { useContactModal } from "@/components/contact-modal";
 
-export function HeroBanner() {
+export function HeroBanner({ title, text }: { title: string; text: string }) {
   const { open } = useContactModal();
 
   return (
@@ -12,11 +12,10 @@ export function HeroBanner() {
     >
       <div className="relative z-10 px-6 pt-10 pb-72 text-center sm:px-8 sm:pt-12 md:max-w-2xl md:py-12 md:pr-48 md:text-left">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          Лавки и садовая мебель ручной работы
+          {title}
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base md:mx-0">
-          Делаем уличные лавки, скамьи и мебель для сада и дачи. Подберём
-          размер, цвет и форму под ваше место — напишите нам, обсудим заказ.
+          {text}
         </p>
         <button
           type="button"
