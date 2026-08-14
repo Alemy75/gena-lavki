@@ -57,6 +57,10 @@ model SiteSettings {
   email    String @default("")
   address  String @default("")
 
+  /// Публичные пути /uploads/... либо пустая строка
+  logo     String @default("")
+  favicon  String @default("")
+
   @@map("site_settings")
 }
 

@@ -9,6 +9,8 @@ const ALLOWED_TYPES = new Set([
   "image/webp",
   "image/gif",
   "image/svg+xml",
+  "image/x-icon",
+  "image/vnd.microsoft.icon",
 ]);
 
 const EXT: Record<string, string> = {
@@ -17,6 +19,8 @@ const EXT: Record<string, string> = {
   "image/webp": ".webp",
   "image/gif": ".gif",
   "image/svg+xml": ".svg",
+  "image/x-icon": ".ico",
+  "image/vnd.microsoft.icon": ".ico",
 };
 
 /** Saves to `public/uploads/`. Returns public path `/uploads/...` or error message. */
@@ -32,7 +36,7 @@ export async function savePublicUpload(
   if (!ALLOWED_TYPES.has(file.type)) {
     return {
       ok: false,
-      error: "Допустимы JPEG, PNG, WebP, GIF, SVG",
+      error: "Допустимы JPEG, PNG, WebP, GIF, SVG, ICO",
     };
   }
 

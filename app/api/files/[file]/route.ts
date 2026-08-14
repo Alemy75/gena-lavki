@@ -18,6 +18,7 @@ const MIME: Record<string, string> = {
   ".webp": "image/webp",
   ".gif": "image/gif",
   ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
 };
 
 type RouteContext = { params: Promise<{ file: string }> };
