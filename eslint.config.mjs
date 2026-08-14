@@ -13,6 +13,10 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "prisma/seed.js",
+    // .claude/ целиком в .gitignore, но eslint его всё равно обходил: рабочие
+    // worktree-каталоги внутри (.claude/worktrees/*) — это копии проекта, и их
+    // исходники с .next давали сотни чужих ошибок в выводе `pnpm lint`.
+    ".claude/**",
   ]),
 ]);
 
