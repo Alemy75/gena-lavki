@@ -186,21 +186,26 @@ export async function POST(request: Request) {
     `Согласие на обработку ПДн: да`,
   ].join("\n");
 
-  // Без конкретной позиции подставляем название сайта из настроек, а не
-  // захардкоженное слово: владелец меняет его в админке, и тема письма едет за ним.
+  // Название сайта из настроек, а не захардкоженное слово: владелец меняет его
+  // в админке, и тема письма с именем отправителя едут за ним.
+  const siteName = await getSiteName();
   const subject = product
     ? `Заявка с сайта: ${product}`
-    : `Заявка с сайта: ${await getSiteName()}`;
+    : `Заявка с сайта: ${siteName}`;
 
   const SEND_DEADLINE_MS = 50_000;
   try {
     await Promise.race([
       transporter.sendMail({
-        from: cfg.user,
+        // В заголовке From — отображаемое имя, чтобы в ящике было видно
+        // «Обращение <сайт>», а не голый адрес. Сам адрес обязан остаться ящиком
+        // из SMTP_USER: Яндекс отвергает отправку от чужого адреса.
+        from: { name: `Обращение ${siteName}`, address: cfg.user },
         to: cfg.to,
         ...(omitReplyTo ? {} : { replyTo: email }),
         subject,
         text,
+        // Конверт SMTP (MAIL FROM/RCPT TO) — только адреса, без имён.
         envelope: {
           from: cfg.user,
           to: cfg.to,
