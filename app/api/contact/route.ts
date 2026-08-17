@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getSiteName } from "@/lib/site";
 import { NextResponse } from "next/server";
 import {
   createContactMailTransporter,
@@ -185,9 +186,11 @@ export async function POST(request: Request) {
     `Согласие на обработку ПДн: да`,
   ].join("\n");
 
+  // Без конкретной позиции подставляем название сайта из настроек, а не
+  // захардкоженное слово: владелец меняет его в админке, и тема письма едет за ним.
   const subject = product
     ? `Заявка с сайта: ${product}`
-    : "Заявка с сайта: каталог";
+    : `Заявка с сайта: ${await getSiteName()}`;
 
   const SEND_DEADLINE_MS = 50_000;
   try {
