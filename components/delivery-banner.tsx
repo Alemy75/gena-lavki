@@ -75,9 +75,9 @@ export function DeliveryBanner({
 
           <Link
             href="/info/delivery"
-            className="mt-6 inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm shadow-primary/30 transition hover:bg-primary-hover"
+            className="mt-6 inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover"
           >
-            Подробнее о доставке →
+            Подробнее о доставке
           </Link>
         </div>
 
